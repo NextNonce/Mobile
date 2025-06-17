@@ -72,6 +72,8 @@ kotlin {
 
             implementation(libs.bignum)
             implementation(libs.bignum.serialization)
+
+            implementation(libs.kermit)
         }
 
         iosMain.dependencies {

@@ -24,6 +24,7 @@ turbine = "1.2.0"
 core-ktx = "1.7.0"
 buildkonfig = "0.17.1"
 bignum  = "0.3.10"
+kermit = "2.0.5"
 
 
 [libraries]
@@ -79,6 +80,8 @@ biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" 
 # BigNum Libraries
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 bignum-serialization = { module = "com.ionspin.kotlin:bignum-serialization-kotlinx", version.ref = "bignum" }
+
+kermit = { module = "co.touchlab:kermit-koin", version.ref = "kermit" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
