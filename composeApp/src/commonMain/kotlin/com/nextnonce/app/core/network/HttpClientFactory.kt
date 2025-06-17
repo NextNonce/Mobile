@@ -1,10 +1,14 @@
 package com.nextnonce.app.core.network
 
 import com.nextnonce.app.BuildKonfig
+import com.nextnonce.app.auth.domain.GetBearerTokensUseCase
+import com.nextnonce.app.auth.domain.RefreshBearerTokensUseCase
 import com.nextnonce.app.logging.KermitLoggerAdapter
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -16,10 +20,24 @@ import io.ktor.client.plugins.logging.Logging
 
 
 object HttpClientFactory {
-    fun create(engine: HttpClientEngine): HttpClient {
+    fun createBackend(
+        engine: HttpClientEngine,
+        getBearerTokensUseCase: GetBearerTokensUseCase,
+        refreshBearerTokensUseCase: RefreshBearerTokensUseCase
+    ): HttpClient {
         return HttpClient(engine) {
             install(ContentNegotiation) {
                 json (JsonHumanReadable)
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        getBearerTokensUseCase.execute()
+                    }
+                    refreshTokens {
+                        refreshBearerTokensUseCase.execute()
+                    }
+                }
             }
             install(HttpTimeout) {
                 socketTimeoutMillis = 20_000L // 20 seconds
@@ -31,6 +49,7 @@ object HttpClientFactory {
                 level = LogLevel.ALL
             }
             defaultRequest {
+                url("https://api.nextnonce.com/v1/")
                 contentType(ContentType.Application.Json)
             }
         }
