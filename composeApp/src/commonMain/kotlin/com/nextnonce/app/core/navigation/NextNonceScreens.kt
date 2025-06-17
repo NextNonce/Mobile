@@ -9,4 +9,13 @@ object Start
 object Auth
 
 @Serializable
+object Home
+
+@Serializable
 object Portfolio
+
+@Serializable
+object Token
+
+@Serializable
+object Settings
