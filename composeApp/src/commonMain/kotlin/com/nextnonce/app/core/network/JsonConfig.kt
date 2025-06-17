@@ -8,6 +8,7 @@ val JsonHumanReadable = Json {
     prettyPrint       = true
     ignoreUnknownKeys = true
     isLenient         = true
+    explicitNulls     = false
 
     serializersModule = humanReadableSerializerModule
 }
