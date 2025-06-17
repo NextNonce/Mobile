@@ -19,6 +19,7 @@ kotlin {
         compilations.configureEach {
             compileTaskProvider.get().compilerOptions {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
+                freeCompilerArgs.add("-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi")
             }
         }
     }
