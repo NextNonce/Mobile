@@ -2,6 +2,7 @@ package com.nextnonce.app.auth.domain
 
 import com.nextnonce.app.auth.domain.model.AuthUserModel
 import com.nextnonce.app.core.domain.DataError
+import com.nextnonce.app.core.domain.EmptyResult
 import com.nextnonce.app.core.domain.Result
 
 interface AuthRepository {
@@ -9,6 +10,8 @@ interface AuthRepository {
     suspend fun getAuthUser(): Result<AuthUserModel, DataError.Local>
 
     suspend fun signOut()
+
+    suspend fun refreshCurrentSession(): EmptyResult<DataError>
 
     /**
      * Returns true if the user is new, false if the user was registered before.

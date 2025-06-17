@@ -4,6 +4,7 @@ import com.nextnonce.app.auth.data.mapper.toAuthUser
 import com.nextnonce.app.auth.domain.AuthRepository
 import com.nextnonce.app.auth.domain.model.AuthUserModel
 import com.nextnonce.app.core.domain.DataError
+import com.nextnonce.app.core.domain.EmptyResult
 import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.logging.AppLogger
 import io.github.jan.supabase.auth.Auth
@@ -12,6 +13,7 @@ import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.datetime.Clock
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 class AuthRepositoryImpl(
@@ -34,6 +36,20 @@ class AuthRepositoryImpl(
                 "Error fetching auth user: ${e.message}"
             }
             Result.Error(DataError.Local.UNKNOWN)
+        }
+    }
+
+    override suspend fun refreshCurrentSession(): EmptyResult<DataError> {
+        try {
+            AppLogger.d {
+                "Refreshing current session"
+            }
+            return Result.Success(auth.refreshCurrentSession())
+        } catch (e: Exception) {
+            AppLogger.e {
+                "Error refreshing session: ${e.message}"
+            }
+            return Result.Error(DataError.Local.UNKNOWN)
         }
     }
 
@@ -137,6 +153,18 @@ class AuthRepositoryImpl(
         val currentSession = auth.currentSessionOrNull()
         AppLogger.d {
             "Current session: ${currentSession?.user?.email ?: "No user"}"
+        }
+        if (currentSession == null) {
+            AppLogger.d {
+                "No current session found"
+            }
+            return null
+        }
+        if (currentSession.expiresIn.hours <= 24.hours) {
+            AppLogger.d {
+                "Current session is about to expire in ${currentSession.expiresIn.hours} hours"
+            }
+            return null
         }
         return currentSession
     }
