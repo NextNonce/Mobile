@@ -81,7 +81,7 @@ biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" 
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 bignum-serialization = { module = "com.ionspin.kotlin:bignum-serialization-kotlinx", version.ref = "bignum" }
 
-kermit = { module = "co.touchlab:kermit-koin", version.ref = "kermit" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
