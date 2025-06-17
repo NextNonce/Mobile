@@ -2,7 +2,7 @@ package com.nextnonce.app.auth.data
 
 import com.nextnonce.app.auth.data.mapper.toAuthUser
 import com.nextnonce.app.auth.domain.AuthRepository
-import com.nextnonce.app.auth.domain.model.AuthUser
+import com.nextnonce.app.auth.domain.model.AuthUserModel
 import com.nextnonce.app.core.domain.DataError
 import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.logging.AppLogger
@@ -18,7 +18,7 @@ class AuthRepositoryImpl(
     private val auth: Auth
 ) : AuthRepository {
 
-    override suspend fun getAuthUser(): Result<AuthUser, DataError.Local> {
+    override suspend fun getAuthUser(): Result<AuthUserModel, DataError.Local> {
         AppLogger.d {
             "Fetching current auth user"
         }
@@ -67,7 +67,7 @@ class AuthRepositoryImpl(
     override suspend fun signUpWithEmail(
         email: String,
         password: String
-    ): Result<AuthUser, DataError> {
+    ): Result<AuthUserModel, DataError> {
         AppLogger.d {
             "Signing up with email: $email"
         }
@@ -96,7 +96,7 @@ class AuthRepositoryImpl(
     override suspend fun signInWithEmail(
         email: String,
         password: String
-    ): Result<AuthUser, DataError> {
+    ): Result<AuthUserModel, DataError> {
         AppLogger.d {
             "Signing in with email: $email"
         }
@@ -122,7 +122,7 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun signInWithGoogle(): Result<AuthUser, DataError.Local> {
+    override suspend fun signInWithGoogle(): Result<AuthUserModel, DataError.Local> {
         return getAuthUser()
     }
 
