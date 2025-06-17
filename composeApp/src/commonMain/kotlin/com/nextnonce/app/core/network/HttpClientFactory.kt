@@ -17,11 +17,7 @@ object HttpClientFactory {
     fun create(engine: HttpClientEngine): HttpClient {
         return HttpClient(engine) {
             install(ContentNegotiation) {
-                json (
-                    json = Json {
-                        ignoreUnknownKeys = true
-                    }
-                )
+                json (JsonHumanReadable)
             }
             install(HttpTimeout) {
                 socketTimeoutMillis = 20_000L // 20 seconds
