@@ -69,6 +69,9 @@ kotlin {
             implementation(libs.coil.core)
             implementation(libs.coil.svg)
             implementation(libs.coil.network.ktor)
+
+            implementation(libs.bignum)
+            implementation(libs.bignum.serialization)
         }
 
         iosMain.dependencies {

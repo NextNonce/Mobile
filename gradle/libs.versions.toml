@@ -23,6 +23,7 @@ assertK = "0.28.1"
 turbine = "1.2.0"
 core-ktx = "1.7.0"
 buildkonfig = "0.17.1"
+bignum  = "0.3.10"
 
 
 [libraries]
@@ -73,6 +74,10 @@ coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil-compose" 
 
 # Biometry Libraries
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" }
+
+# BigNum Libraries
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+bignum-serialization = { module = "com.ionspin.kotlin:bignum-serialization-kotlinx", version.ref = "bignum" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
