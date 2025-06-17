@@ -22,6 +22,7 @@ biometry = "1.1.0"
 assertK = "0.28.1"
 turbine = "1.2.0"
 core-ktx = "1.7.0"
+buildkonfig = "0.17.1"
 
 
 [libraries]
@@ -82,6 +83,7 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 
 [bundles]
 ktor = [
