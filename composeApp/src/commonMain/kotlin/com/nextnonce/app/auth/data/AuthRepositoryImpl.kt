@@ -71,13 +71,13 @@ class AuthRepositoryImpl(
         AppLogger.d {
             "User created at: $userCreatedAt"
         }
-        val delta = Clock.System.now() - userCreatedAt
+        val userLastSignInAt = userSession.user?.lastSignInAt
+            ?: return null
         AppLogger.d {
-            "Time since user creation: $delta"
+            "User last sign-in at: $userLastSignInAt"
         }
 
-        // Check if the user was created within the last 5 minutes
-        return delta < 3.minutes
+        return userLastSignInAt - userCreatedAt <= 1.minutes
     }
 
     override suspend fun signUpWithEmail(
