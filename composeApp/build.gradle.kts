@@ -83,6 +83,10 @@ kotlin {
             implementation(libs.bignum.serialization)
 
             implementation(libs.kermit)
+
+            implementation(project.dependencies.platform(libs.supabase.bom))
+            implementation(libs.supabase.auth)
+            implementation(libs.supabase.compose.auth)
         }
 
         iosMain.dependencies {
@@ -144,6 +148,11 @@ buildkonfig {
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "SUPABASE_ANON_KEY",
             localProperties.getProperty("SUPABASE_ANON_KEY", "your-anon-key")
+        )
+        buildConfigField(
+            com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
+            "GOOGLE_WEB_CLIENT_ID",
+            localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "your-google-web-client-id")
         )
     }
 }

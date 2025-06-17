@@ -25,6 +25,7 @@ core-ktx = "1.7.0"
 buildkonfig = "0.17.1"
 bignum  = "0.3.10"
 kermit = "2.0.5"
+supabase = "3.1.4"
 
 
 [libraries]
@@ -81,7 +82,13 @@ biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" 
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 bignum-serialization = { module = "com.ionspin.kotlin:bignum-serialization-kotlinx", version.ref = "bignum" }
 
+# Logging Libraries
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+
+# Auth Libraries
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
