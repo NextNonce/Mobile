@@ -12,6 +12,9 @@ object Auth
 object Home
 
 @Serializable
+object AddWallet
+
+@Serializable
 object Portfolio
 
 @Serializable
