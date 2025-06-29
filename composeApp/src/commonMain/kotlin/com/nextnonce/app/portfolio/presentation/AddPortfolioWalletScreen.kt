@@ -56,7 +56,7 @@ fun AddPortfolioWalletScreen(
     onBackClicked: () -> Unit,
     onWalletAdded: () -> Unit
 ) {
-    var state by remember { mutableStateOf(AddWalletState()) }
+    var state by remember { mutableStateOf(AddPortfolioWalletState()) }
 
     // This effect triggers navigation exactly once when a wallet is successfully added.
     LaunchedEffect(state.isWalletAdded) {
@@ -66,10 +66,9 @@ fun AddPortfolioWalletScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AddWalletTopBar(
-                onBackClicked = onBackClicked
+                onBackClicked = onBackClicked,
             )
         }
     ) { paddingValues ->
@@ -129,12 +128,8 @@ private fun AddWalletTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-        },
-        actions = {
-            // QR Code scanner removed as requested.
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = Color.Transparent
@@ -159,7 +154,6 @@ private fun AddWalletContent(
             text = "Enter a wallet address",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp)) // Adjusted spacer
 
@@ -176,17 +170,10 @@ private fun AddWalletContent(
             onValueChange = onNameChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-            ,
+                .height(56.dp),
             placeholder = { Text("Name (Optional)") },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            )
         )
 
         if (error != null) {
@@ -218,15 +205,10 @@ private fun BoxScope.AddWalletContinueButton(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             enabled = isEnabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            )
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     strokeWidth = 2.dp
                 )
             } else {
@@ -264,13 +246,5 @@ private fun AddressInputField(
         isError = isError,
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge,
-        colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            errorBorderColor = MaterialTheme.colorScheme.error,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-        trailingIcon = null
     )
 }
