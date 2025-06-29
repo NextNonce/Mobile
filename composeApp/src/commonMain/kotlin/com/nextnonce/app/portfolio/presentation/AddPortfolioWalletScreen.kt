@@ -1,4 +1,4 @@
-package com.nextnonce.app.wallet.presentation
+package com.nextnonce.app.portfolio.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
-data class AddWalletState(
+data class AddPortfolioWalletState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val walletAddress: TextFieldValue = TextFieldValue(""),
@@ -52,7 +52,7 @@ data class AddWalletState(
 
 // --- AddWalletScreen Composable ---
 @Composable
-fun AddWalletScreen(
+fun AddPortfolioWalletScreen(
     onBackClicked: () -> Unit,
     onWalletAdded: () -> Unit
 ) {
