@@ -26,8 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -74,8 +72,8 @@ data class Wallet(
 // --- Dummy Data ---
 val dummyPortfolio = PortfolioData(
     totalValue = 1439.38,
-    changePercent = null,
-    //changePercent = -3.21,
+    //changePercent = null,
+    changePercent = 3.21,
 )
 
 val dummyWallets = listOf(
@@ -88,8 +86,8 @@ val dummyWallets = listOf(
     Wallet("2", "0xe6025d...0b1724", 222.2, null),
     Wallet("5", "0xe6025d...0b1724", 222.2, null),
     Wallet("6", "abcdefghijklmnopqrstuv", 222.2, null),
-    Wallet("6", "abcdefghijklmnopqr", 222.2, null),
-    Wallet("6", "ABCDEFGHIJKLMNOPQR", 222.2, null),
+    Wallet("6", "abcdefghijklmnopqr", 222.2, 2.2),
+    Wallet("6", "ABCDEFGHIJKLMNOPQR", 222.2, -23.4),
     Wallet("7", "abcdefghijklmnopqrstuv", null, null),
     //Wallet("3", "0xd49cad...b88ff7", 298.44, -1.32),
    // Wallet("4", "0x14ff0b...1205b8", 405.60, -0.54),
@@ -132,9 +130,7 @@ fun HomeScreen(
     onAddWalletClicked: () -> Unit = {},
     onWalletClicked: (String) -> Unit = {},
 ) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -163,14 +159,12 @@ fun HomeScreen(
 @Composable
 fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
     val cardShape = RoundedCornerShape(20.dp)
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(cardShape)
             .clickable(onClick = onClick),
         shape = cardShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -183,7 +177,6 @@ fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
                     text = "Portfolio",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -197,7 +190,6 @@ fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
                 text = formatCurrency(portfolio.totalValue),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
             )
 
             val percentageText: String
@@ -253,7 +245,6 @@ fun MyWalletsSection(
                 text = "My Wallets",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
             )
             IconButton(onClick = onAddWalletClicked) {
                 Icon(
@@ -277,14 +268,12 @@ fun MyWalletsSection(
 @Composable
 fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
     val cardShape = RoundedCornerShape(16.dp)
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(cardShape)
             .clickable(onClick = onClick),
         shape = cardShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
@@ -311,7 +300,6 @@ fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.onGloballyPositioned { coordinates ->
-                        // Measure the width of the address text and store it as Dp
                         if (addressWidth == null) {
                             addressWidth = with(density) { coordinates.size.width.toDp() }
                         }
@@ -325,7 +313,6 @@ fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
                         Text(
                             text = formatCurrency(wallet.totalBalance),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                         if (wallet.changePercent != null) {
