@@ -78,7 +78,7 @@ fun AuthScreen(
         ) {
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -147,18 +147,18 @@ private fun AuthInputField(
     label: String,
     isPassword: Boolean = false
 ) {
-    val shape: Shape = RoundedCornerShape(8.dp)
+    val shape: Shape = RoundedCornerShape(10.dp)
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        modifier = Modifier
+            .fillMaxWidth(0.85f)
+            .height(56.dp),
+        placeholder = { Text(label, style = MaterialTheme.typography.bodyLarge) },
+        shape = shape,
         singleLine = true,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Email),
-        shape = shape,
-        modifier = Modifier
-            .fillMaxWidth(0.85f)
-            .clip(shape)
     )
 }
 
@@ -167,28 +167,16 @@ private fun AuthButton(
     text: String,
     onClick: () -> Unit
 ) {
-    val shape: Shape = RoundedCornerShape(8.dp)
+    val shape: Shape = RoundedCornerShape(10.dp)
     Button(
         onClick = onClick,
         shape = shape,
-        colors = ButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-        ),
         modifier = Modifier
             .fillMaxWidth(0.85f)
             .height(48.dp)
-            .border(
-                width = 1.4.dp,
-                color = MaterialTheme.colorScheme.onBackground,
-                shape = shape
-            )
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onBackground,
             fontSize = MaterialTheme.typography.titleMedium.fontSize
         )
     }
