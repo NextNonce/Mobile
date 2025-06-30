@@ -1,9 +1,10 @@
-package com.nextnonce.app.user.data.remote
+package com.nextnonce.app.user.data
 
-import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.core.domain.DataError
+import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.user.data.mapper.toCreateUserDto
 import com.nextnonce.app.user.data.mapper.toUserModel
+import com.nextnonce.app.user.data.remote.RemoteUserDataSource
 import com.nextnonce.app.user.domain.UserRepository
 import com.nextnonce.app.user.domain.model.UserModel
 
