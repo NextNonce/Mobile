@@ -1,6 +1,5 @@
 package com.nextnonce.app.core.network
 
-import com.nextnonce.app.BuildKonfig
 import com.nextnonce.app.auth.domain.GetBearerTokensUseCase
 import com.nextnonce.app.auth.domain.RefreshBearerTokensUseCase
 import com.nextnonce.app.logging.KermitLoggerAdapter
