@@ -6,5 +6,5 @@ data class Wallet(
     val address: String,
     val chainType: ChainType,
 ) {
-    val id get() = "$chainType-$address"
+    val id get() = "$chainType:$address"
 }
