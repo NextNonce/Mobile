@@ -50,79 +50,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
-import nextnonce.composeapp.generated.resources.Res
-import nextnonce.composeapp.generated.resources.loading
-import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.math.absoluteValue
+import org.koin.compose.viewmodel.koinViewModel
 
-data class PortfolioData(
-    val totalValue: Double,
-    val changePercent: Double?,
-)
-
-data class Wallet(
-    val id: String,
-    val address: String,
-    val totalBalance: Double?,
-    val changePercent: Double?
-)
-
-
-// --- Dummy Data ---
-val dummyPortfolio = PortfolioData(
-    totalValue = 1439.38,
-    //changePercent = null,
-    changePercent = 3.21,
-)
-
-val dummyWallets = listOf(
-    //Wallet("1", "0x14ff0b...1205b8", 405.60, -0.54),
-    Wallet("1", "0x14ff0b...1205b8", 40500000000.60, -0.54),
-    //Wallet("2", "0xe6025d...0b1724", 735.34, 2.67),
-    Wallet("2", "0xe6025d...0b1724", null, 2.67),
-    Wallet("2", "0xe6025d...0b1724", null, null),
-    Wallet("3", "abcdefghijklmnopqrstuv", null, null),
-    Wallet("2", "0xe6025d...0b1724", 222.2, null),
-    Wallet("5", "0xe6025d...0b1724", 222.2, null),
-    Wallet("6", "abcdefghijklmnopqrstuv", 222.2, null),
-    Wallet("6", "abcdefghijklmnopqr", 222.2, 2.2),
-    Wallet("6", "ABCDEFGHIJKLMNOPQR", 222.2, -23.4),
-    Wallet("7", "abcdefghijklmnopqrstuv", null, null),
-    //Wallet("3", "0xd49cad...b88ff7", 298.44, -1.32),
-   // Wallet("4", "0x14ff0b...1205b8", 405.60, -0.54),
-//    Wallet("5", "0xe6025d...0b1724", 735.34, 2.67),
-//    Wallet("6", "0xd49cad...b88ff7", 298.44, -1.32),
-//    Wallet("7", "0x14ff0b...1205b8", 405.60, -0.54),
-//    Wallet("8", "0xe6025d...0b1724", 735.34, 2.67),
-//    Wallet("9", "0xd49cad...b88ff7", 298.44, -1.32),
-//    Wallet("10", "0xd49cad...b88ff7", 298.44, -1.32),
-)
-
-
-// --- Formatting Utilities (KMP Safe) ---
-
-fun formatCurrency(value: Double, padValue: Int = 2): String {
-    val integerPart = value.toLong()
-    val fractionalPart = ((value - integerPart) * 100).toInt().absoluteValue
-
-    val integerFormatted = integerPart
-        .toString()
-        .reversed()
-        .chunked(3)
-        .joinToString(",")
-        .reversed()
-
-    if (padValue == 0 || fractionalPart == 0 || integerPart >= 1_000_000_000) {
-        return "$$integerFormatted"
-    }
-
-    val fractionalFormatted = fractionalPart.toString().padStart(padValue, '0')
-
-    return "$$integerFormatted.$fractionalFormatted"
-}
-
-// --- Main HomeScreen Composable ---
 
 @Composable
 fun HomeScreen(
