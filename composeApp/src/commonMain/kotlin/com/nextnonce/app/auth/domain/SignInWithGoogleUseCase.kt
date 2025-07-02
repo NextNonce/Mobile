@@ -4,8 +4,7 @@ import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.auth.domain.model.AuthUserModel
 import com.nextnonce.app.auth.domain.model.toUserModel
 import com.nextnonce.app.core.domain.DataError
-import com.nextnonce.app.core.platform.Platform
-import com.nextnonce.app.core.platform.currentPlatform
+import com.nextnonce.app.getPlatform
 import com.nextnonce.app.logging.AppLogger
 import com.nextnonce.app.user.domain.CreateUserUseCase
 
@@ -15,7 +14,7 @@ class SignInWithGoogleUseCase(
 ) {
 
     suspend fun execute(): Result<AuthUserModel, DataError> {
-        if (currentPlatform !is Platform.Android) {
+        if (getPlatform().name != "Android") {
             AppLogger.e { "SignInWithGoogleUseCase can only be executed on Android platform." }
             return Result.Error(
                 DataError.Remote.UNKNOWN
