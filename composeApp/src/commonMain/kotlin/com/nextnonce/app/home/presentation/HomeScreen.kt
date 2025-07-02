@@ -11,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,7 +47,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nextnonce.app.core.enums.NumberSign
+import com.nextnonce.app.core.presentation.LoadingOverlay
+import com.nextnonce.app.core.utils.formatAddress
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -56,27 +58,32 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     onPortfolioClicked: () -> Unit = {},
-    onAddWalletClicked: () -> Unit = {},
+    onAddWalletClicked: (String) -> Unit = {},
     onWalletClicked: (String) -> Unit = {},
 ) {
+    val homeViewModel = koinViewModel<HomeViewModel>()
+    val state by homeViewModel.state.collectAsStateWithLifecycle()
+
     Scaffold { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(paddingValues) // Use Scaffold's padding
+                .padding(16.dp), // Apply your own screen padding
+            verticalArrangement = Arrangement.spacedBy(12.dp) // Space between items
         ) {
-            item {
-                PortfolioSummaryCard(
-                    portfolio = dummyPortfolio,
-                    onClick = onPortfolioClicked
-                )
-            }
-            item {
-                MyWalletsSection(
-                    wallets = dummyWallets,
-                    onAddWalletClicked = onAddWalletClicked,
+            PortfolioSummaryCard(
+                state = state,
+                onClick = onPortfolioClicked
+            )
+
+            MyWalletsHeader(state = state, onAddWalletClicked = onAddWalletClicked)
+
+            if (state.areWalletsLoading) {
+                LoadingOverlay()
+            } else {
+                WalletItems(
+                    state = state,
                     onWalletClicked = onWalletClicked
                 )
             }
@@ -86,8 +93,9 @@ fun HomeScreen(
 
 // --- Reusable UI Components ---
 @Composable
-fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
+fun PortfolioSummaryCard(state: HomeState, onClick: () -> Unit) {
     val cardShape = RoundedCornerShape(20.dp)
+    val portfolio = state.portfolio
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -115,20 +123,27 @@ fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
                 )
             }
 
-            Text(
-                text = formatCurrency(portfolio.totalValue),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-            )
+            if (portfolio.formatedBalanceQuote == null) {
+                ShimmerLoadingIndicator(modifier = Modifier.fillMaxWidth(0.25f), height = 40.dp)
+            } else {
+                Text(
+                    text = portfolio.formatedBalanceQuote,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
 
             val percentageText: String
             val textColor: Color
 
-            if (portfolio.changePercent != null) {
+            if (portfolio.formatedChangePercent != null && portfolio.changePercentSign != null) {
                 val customColors = LocalNextNonceColorsPalette.current
-                textColor = if (portfolio.changePercent < 0) customColors.lossRed else customColors.profitGreen
-                val sign = if (portfolio.changePercent > 0) "+" else ""
-                percentageText = "$sign${portfolio.changePercent}%"
+                textColor = when (portfolio.changePercentSign) {
+                    NumberSign.POSITIVE -> customColors.profitGreen
+                    NumberSign.NEGATIVE -> customColors.lossRed
+                    NumberSign.ZERO -> MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                percentageText = portfolio.formatedChangePercent
             } else {
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant
                 percentageText = "0.00%"
@@ -156,38 +171,53 @@ fun PortfolioSummaryCard(portfolio: PortfolioData, onClick: () -> Unit) {
 }
 
 @Composable
-fun MyWalletsSection(
-    wallets: List<Wallet>,
-    onAddWalletClicked: () -> Unit,
+fun MyWalletsHeader(
+    state: HomeState,
+    onAddWalletClicked: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "My Wallets",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        IconButton(
+            onClick = {
+                if (state.portfolio.id != null) {
+                    onAddWalletClicked(state.portfolio.id)
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Wallet",
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun WalletItems(
+    state: HomeState,
     onWalletClicked: (String) -> Unit
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "My Wallets",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            IconButton(onClick = onAddWalletClicked) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Wallet",
-                    modifier = Modifier.size(28.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        wallets.forEach { wallet ->
+        items(
+            count = state.wallets.size,
+            key = { index -> state.wallets[index].id }
+        ) { index ->
+            val wallet = state.wallets[index]
             WalletItem(
-                wallet = wallet,
+                walletItem = wallet,
                 onClick = { onWalletClicked(wallet.id) }
             )
         }
@@ -195,7 +225,7 @@ fun MyWalletsSection(
 }
 
 @Composable
-fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
+fun WalletItem(walletItem: UIHomeWalletItem, onClick: () -> Unit) {
     val cardShape = RoundedCornerShape(16.dp)
     ElevatedCard(
         modifier = Modifier
@@ -224,7 +254,7 @@ fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
                 val density = LocalDensity.current
 
                 Text(
-                    text = wallet.address,
+                    text = walletItem.name ?: formatAddress(walletItem.address),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -237,20 +267,23 @@ fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                if (wallet.totalBalance != null) {
+                if (walletItem.formatedBalanceQuote != null) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = formatCurrency(wallet.totalBalance),
+                            text = walletItem.formatedBalanceQuote,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        if (wallet.changePercent != null) {
+                        if (walletItem.formatedChangePercent != null && walletItem.changePercentSign != null) {
                             Spacer(modifier = Modifier.width(8.dp))
                             val customColors = LocalNextNonceColorsPalette.current
-                            val changeColor = if (wallet.changePercent < 0) customColors.lossRed else customColors.profitGreen
-                            val sign = if (wallet.changePercent > 0) "+" else ""
+                            val changeColor = when (walletItem.changePercentSign) {
+                                NumberSign.POSITIVE -> customColors.profitGreen
+                                NumberSign.NEGATIVE -> customColors.lossRed
+                                NumberSign.ZERO -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
                             Text(
-                                text = "$sign${wallet.changePercent}%",
+                                text = walletItem.formatedChangePercent,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = changeColor,
                                 fontWeight = FontWeight.SemiBold
@@ -278,7 +311,7 @@ fun WalletItem(wallet: Wallet, onClick: () -> Unit) {
  * A reusable composable that displays an animated shimmer effect.
  */
 @Composable
-private fun ShimmerLoadingIndicator(modifier: Modifier = Modifier) {
+private fun ShimmerLoadingIndicator(modifier: Modifier = Modifier, height: Dp = 24.dp) {
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim = transition.animateFloat(
         initialValue = 0f,
@@ -302,7 +335,7 @@ private fun ShimmerLoadingIndicator(modifier: Modifier = Modifier) {
 
     Box(
         modifier = modifier
-            .height(24.dp)
+            .height(height)
             .clip(RoundedCornerShape(6.dp))
             .background(brush)
     )
