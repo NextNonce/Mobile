@@ -15,7 +15,7 @@ class SignUpWithEmailUseCase(
     suspend fun execute(email: String, password: String): Result<AuthUserModel, DataError> {
         return when (val authUser = repo.signUpWithEmail(email, password)) {
             is Result.Success -> {
-                when ( val user = createUserUseCase.execute(authUser.data.toUserModel())) {
+                when (val user = createUserUseCase.execute(authUser.data.toUserModel())) {
                     is Result.Success -> authUser // User creation was successful, return authUser
                     is Result.Error -> {
                         // If user creation failed, we can log the error and return it
