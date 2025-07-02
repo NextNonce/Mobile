@@ -1,7 +1,5 @@
 package com.nextnonce.app.auth.presentation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,15 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nextnonce.app.core.platform.Platform
-import com.nextnonce.app.core.platform.currentPlatform
+import com.nextnonce.app.core.presentation.LoadingOverlay
+import com.nextnonce.app.getPlatform
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
@@ -76,7 +71,6 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,7 +104,7 @@ fun AuthScreen(
             }
 
             // Continue with Google (Android only)
-            if (currentPlatform is Platform.Android) {
+            if (getPlatform().name == "Android") {
                 val action = composeAuth.rememberSignInWithGoogle(
                     onResult = { res ->
                         if (res is NativeSignInResult.Success) {
@@ -122,23 +116,23 @@ fun AuthScreen(
                     action.startFlow()
                 }
             }
-
             // Error message
             state.error?.let { err ->
                 Text(
-                    stringResource(err),
+                    text = stringResource(err),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
+    }
 
-        if (state.isLoading) {
-            LoadingOverlay()
-        }
+    if (state.isLoading) {
+        LoadingOverlay()
     }
 }
+
 
 @Composable
 private fun AuthInputField(
