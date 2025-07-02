@@ -1,8 +1,7 @@
 package com.nextnonce.app.core.auth
 
 import com.nextnonce.app.BuildKonfig
-import com.nextnonce.app.core.platform.Platform
-import com.nextnonce.app.core.platform.currentPlatform
+import com.nextnonce.app.getPlatform
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.compose.auth.ComposeAuth
@@ -20,7 +19,7 @@ object AuthProvider {
         ) {
             install(Auth)
             install(ComposeAuth) {
-                if (currentPlatform is Platform.Android) {
+                if (getPlatform().name == "Android") {
                     googleNativeLogin(BuildKonfig.GOOGLE_WEB_CLIENT_ID)
                 }
             }
