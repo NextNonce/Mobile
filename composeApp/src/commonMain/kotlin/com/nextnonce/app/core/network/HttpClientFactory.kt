@@ -2,6 +2,9 @@ package com.nextnonce.app.core.network
 
 import com.nextnonce.app.auth.domain.GetBearerTokensUseCase
 import com.nextnonce.app.auth.domain.RefreshBearerTokensUseCase
+import com.nextnonce.app.core.utils.API_BASE_URL
+import com.nextnonce.app.core.utils.REQUEST_TIMEOUT_MILLIS
+import com.nextnonce.app.core.utils.SOCKET_TIMEOUT_MILLIS
 import com.nextnonce.app.logging.KermitLoggerAdapter
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.HttpClient
@@ -39,8 +42,8 @@ object HttpClientFactory {
                 }
             }
             install(HttpTimeout) {
-                socketTimeoutMillis = 20_000L // 20 seconds
-                requestTimeoutMillis = 20_000L // 20 seconds
+                socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
+                requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
             }
             install(HttpCache)
             install(Logging) {
@@ -48,7 +51,7 @@ object HttpClientFactory {
                 level = LogLevel.ALL
             }
             defaultRequest {
-                url("https://api.nextnonce.com/v1/")
+                url(API_BASE_URL)
                 contentType(ContentType.Application.Json)
             }
         }
