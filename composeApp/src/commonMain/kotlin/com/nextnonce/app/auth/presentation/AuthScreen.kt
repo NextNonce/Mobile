@@ -175,15 +175,3 @@ private fun AuthButton(
         )
     }
 }
-
-@Composable
-private fun LoadingOverlay() {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.4f)),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
