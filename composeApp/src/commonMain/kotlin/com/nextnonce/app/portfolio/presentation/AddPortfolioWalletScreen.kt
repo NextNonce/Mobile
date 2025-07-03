@@ -41,22 +41,21 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
-data class AddPortfolioWalletState(
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val walletAddress: TextFieldValue = TextFieldValue(""),
-    val walletName: String = "",
-    val isWalletAdded: Boolean = false
-)
 
 // --- AddWalletScreen Composable ---
 @Composable
 fun AddPortfolioWalletScreen(
+    portfolioId: String,
     onBackClicked: () -> Unit,
     onWalletAdded: () -> Unit
 ) {
-    var state by remember { mutableStateOf(AddPortfolioWalletState()) }
+    val viewModel = koinViewModel<AddPortfolioWalletViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     // This effect triggers navigation exactly once when a wallet is successfully added.
     LaunchedEffect(state.isWalletAdded) {
@@ -81,33 +80,19 @@ fun AddPortfolioWalletScreen(
             AddWalletContent(
                 walletAddress = state.walletAddress,
                 walletName = state.walletName,
-                onAddressChange = { newAddress ->
-                    // Enforce character limit for address
-                    if (newAddress.text.length <= 255) {
-                        state = state.copy(walletAddress = newAddress, error = null)
-                    }
-                },
-                onNameChange = { newName ->
-                    // Enforce character limit for name
-                    if (newName.length <= 18) {
-                        state = state.copy(walletName = newName)
-                    }
-                },
-                error = state.error
+                onAddressChange = viewModel::onAddressChange,
+                onNameChange = viewModel::onNameChange,
+                error = state.error,
+                onAddressFocusLost = viewModel::onAddressFocusLost
             )
 
             AddWalletContinueButton(
                 isLoading = state.isLoading,
                 isEnabled = state.walletAddress.text.isNotEmpty() && !state.isLoading,
                 onClick = {
-                    state = state.copy(isLoading = true)
-                    // Dummy validation
-                    state = if (!state.walletAddress.text.startsWith("0x") || state.walletAddress.text.length < 10) {
-                        state.copy(isLoading = false, error = "Address not found")
-                    } else {
-                        // On success, update the state to trigger the LaunchedEffect.
-                        state.copy(isLoading = false, error = null, isWalletAdded = true)
-                    }
+                    viewModel.addPortfolioWallet(
+                        portfolioId = portfolioId,
+                    )
                 }
             )
         }
@@ -140,10 +125,11 @@ private fun AddWalletTopBar(
 @Composable
 private fun AddWalletContent(
     walletAddress: TextFieldValue,
-    walletName: String,
+    walletName: String?,
     onAddressChange: (TextFieldValue) -> Unit,
     onNameChange: (String) -> Unit,
-    error: String?
+    error: StringResource?,
+    onAddressFocusLost: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -161,12 +147,13 @@ private fun AddWalletContent(
         AddressInputField(
             value = walletAddress,
             onValueChange = onAddressChange,
-            isError = error != null
+            isError = error != null,
+            onAddressFocusLost
         )
 
         // Wallet Name Input Field
         OutlinedTextField(
-            value = walletName,
+            value = walletName ?: "",
             onValueChange = onNameChange,
             modifier = Modifier
                 .fillMaxWidth()
@@ -178,7 +165,7 @@ private fun AddWalletContent(
 
         if (error != null) {
             Text(
-                text = error,
+                text = stringResource(error),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
@@ -227,7 +214,8 @@ private fun BoxScope.AddWalletContinueButton(
 private fun AddressInputField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    isError: Boolean
+    isError: Boolean,
+    onFocusLost: () -> Unit
 ) {
     OutlinedTextField(
         value = value,
@@ -238,7 +226,7 @@ private fun AddressInputField(
             // When the field loses focus, move the cursor to the beginning.
             .onFocusChanged { focusState ->
                 if (!focusState.isFocused) {
-                    onValueChange(value.copy(selection = TextRange.Zero))
+                    onFocusLost()
                 }
             },
         placeholder = { Text("Address", style = MaterialTheme.typography.bodyLarge) },
