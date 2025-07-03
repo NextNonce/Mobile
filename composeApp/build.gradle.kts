@@ -15,14 +15,6 @@ plugins {
 }
 
 kotlin {
-    targets.configureEach {
-        compilations.configureEach {
-            compileTaskProvider.get().compilerOptions {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
-                freeCompilerArgs.add("-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi")
-            }
-        }
-    }
 
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -103,7 +95,7 @@ kotlin {
 
 android {
     namespace = "com.nextnonce.app"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdkVersion(libs.versions.android.compileSdk.get().toInt())
 
     defaultConfig {
         applicationId = "com.nextnonce.app"
