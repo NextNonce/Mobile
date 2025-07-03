@@ -1,0 +1,10 @@
+package com.nextnonce.app.core.utils
+
+const val CHAIN_LOGO_BASE = "https://lmcrzgkuppixwchhfwbm.supabase.co/storage/v1/object/public/chain/logo"
+
+const val API_BASE_URL = "https://api.nextnonce.com/v1/"
+
+const val SOCKET_TIMEOUT_MILLIS = 60_000L
+const val REQUEST_TIMEOUT_MILLIS = 60_000L
+
+const val CACHE_AGE_ONE_MINUTE = 60_000L
