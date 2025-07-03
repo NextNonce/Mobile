@@ -5,10 +5,22 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("type")
-sealed interface AssetDto
+sealed interface AssetDto {
+    companion object {
+        val module = SerializersModule {
+            polymorphic(AssetDto::class) {
+                subclass(TokenDto::class)
+                subclass(UnifiedTokenDto::class)
+            }
+        }
+    }
+}
 
 @Serializable
 @SerialName("single")
