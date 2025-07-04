@@ -35,7 +35,7 @@ actual fun formatQuoteChange(amount: BigDecimal, showDecimal: Boolean): String {
 actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
     val amountJvmBd = JvmBigDecimal(amount.toString())
     val pattern = when {
-        amountJvmBd >= JvmBigDecimal.TEN -> "#,###.000"
+        amountJvmBd >= JvmBigDecimal.ONE -> "#,###.000"
         amountJvmBd.compareTo(JvmBigDecimal.ZERO) == 0 -> "0.000"
         else -> "0.00000000"
     }
@@ -45,7 +45,10 @@ actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
 }
 
 actual fun formatPercentage(amount: BigDecimal): String {
-    val prefix = if (amount > BigDecimal.ZERO) "+" else ""
     val amountJvmBd = JvmBigDecimal(amount.toString())
+    if (amountJvmBd.abs() <= JvmBigDecimal("0.01")) {
+        return "0.00%"
+    }
+    val prefix = if (amount > BigDecimal.ZERO) "+" else ""
     return prefix + DecimalFormat("0.00").format(amountJvmBd) + "%"
 }
