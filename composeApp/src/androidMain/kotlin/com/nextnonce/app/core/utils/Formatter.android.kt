@@ -18,6 +18,20 @@ actual fun formatQuote(amount: BigDecimal, showDecimal: Boolean): String {
     return "$" + formatter.format(amountJvmBd)
 }
 
+actual fun formatQuoteChange(amount: BigDecimal, showDecimal: Boolean): String {
+    val amountAbs = amount.abs()
+    val amountJvmBd = JvmBigDecimal(amountAbs.toString())
+    if (amountJvmBd <= JvmBigDecimal("0.01")) {
+        if (!showDecimal) {
+            return "$0"
+        }
+        return "$0.00"
+    }
+    val prefix = if (amount > BigDecimal.ZERO) "+" else "-"
+    val formattedQuote = formatQuote(amountAbs, showDecimal)
+    return prefix + formattedQuote
+}
+
 actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
     val amountJvmBd = JvmBigDecimal(amount.toString())
     val pattern = when {
