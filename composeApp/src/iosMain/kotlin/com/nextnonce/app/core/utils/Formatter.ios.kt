@@ -29,6 +29,18 @@ actual fun formatQuote(amount: BigDecimal, showDecimal: Boolean): String {
     return formatter.stringFromNumber(decimalNumber)?.let { "$$it" } ?: ""
 }
 
+actual fun formatQuoteChange(amount: BigDecimal, showDecimal: Boolean): String {
+    if (amount.abs() <= "0.01".toBigDecimal()) {
+        if (!showDecimal) {
+            return "$0"
+        }
+        return "$0.00"
+    }
+    val prefix = if (amount > BigDecimal.ZERO) "+" else "-"
+    val formattedQuote = formatQuote(amount.abs(), showDecimal)
+    return "$prefix$formattedQuote"
+}
+
 actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
     val formatter = NSNumberFormatter().apply {
         numberStyle = NSNumberFormatterDecimalStyle
