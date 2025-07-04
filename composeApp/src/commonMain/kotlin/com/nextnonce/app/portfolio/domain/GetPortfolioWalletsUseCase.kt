@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class GetPortfolioWalletsUseCase(
     private val portfolioRepository: PortfolioRepository,
 ) {
-    suspend fun execute(id: String): Flow<Result<List<PortfolioWalletModel>, DataError>> {
+    fun execute(id: String): Flow<Result<List<PortfolioWalletModel>, DataError>> {
         return portfolioRepository.portfolioWalletsFlow(id)
     }
 }

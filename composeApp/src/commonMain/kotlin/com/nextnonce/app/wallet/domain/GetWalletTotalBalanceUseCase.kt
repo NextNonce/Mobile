@@ -12,10 +12,10 @@ class GetWalletTotalBalanceUseCase(
     private val walletRepository: WalletRepository
 ) {
     fun execute(
-        wallet: Wallet
+        walletId: String
     ): Flow<Result<TotalBalance, DataError>> {
         return walletRepository
-            .balancesFlow(wallet)
+            .balancesFlow(walletId)
             .map { result: Result<WalletBalancesModel, DataError> ->
                 when (result) {
                     is Result.Success -> Result.Success(result.data.totalBalance)
