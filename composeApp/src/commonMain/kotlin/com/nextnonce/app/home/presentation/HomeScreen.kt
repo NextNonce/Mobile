@@ -1,11 +1,5 @@
 package com.nextnonce.app.home.presentation
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,8 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -50,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nextnonce.app.core.enums.NumberSign
 import com.nextnonce.app.core.presentation.LoadingOverlay
+import com.nextnonce.app.core.presentation.ShimmerLoadingIndicator
 import com.nextnonce.app.core.utils.formatAddress
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
 import org.koin.compose.viewmodel.koinViewModel
@@ -59,7 +52,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     onPortfolioClicked: () -> Unit = {},
     onAddWalletClicked: (String) -> Unit = {},
-    onWalletClicked: (String) -> Unit = {},
+    onWalletClicked: (String, String?) -> Unit = { walletId, walletName -> }
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val state by homeViewModel.state.collectAsStateWithLifecycle()
@@ -69,7 +62,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues) // Use Scaffold's padding
-                .padding(16.dp), // Apply your own screen padding
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp) // Space between items
         ) {
             PortfolioSummaryCard(
@@ -205,7 +198,7 @@ fun MyWalletsHeader(
 @Composable
 fun WalletItems(
     state: HomeState,
-    onWalletClicked: (String) -> Unit
+    onWalletClicked: (String, String?) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -218,7 +211,11 @@ fun WalletItems(
             val wallet = state.wallets[index]
             WalletItem(
                 walletItem = wallet,
-                onClick = { onWalletClicked(wallet.id) }
+                onClick = {
+                    if (!wallet.isLoading) {
+                        onWalletClicked(wallet.id, wallet.name)
+                    }
+                }
             )
         }
     }
@@ -305,38 +302,4 @@ fun WalletItem(walletItem: UIHomeWalletItem, onClick: () -> Unit) {
             )
         }
     }
-}
-
-/**
- * A reusable composable that displays an animated shimmer effect.
- */
-@Composable
-private fun ShimmerLoadingIndicator(modifier: Modifier = Modifier, height: Dp = 24.dp) {
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_translation"
-    )
-
-    val brush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.surfaceContainerHigh,
-            MaterialTheme.colorScheme.surfaceContainerHighest,
-            MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
-        start = Offset.Zero,
-        end = Offset(x = translateAnim.value, y = translateAnim.value)
-    )
-
-    Box(
-        modifier = modifier
-            .height(height)
-            .clip(RoundedCornerShape(6.dp))
-            .background(brush)
-    )
 }
