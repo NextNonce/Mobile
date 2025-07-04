@@ -1,6 +1,7 @@
 package com.nextnonce.app.core.utils
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import platform.Foundation.NSDecimalNumber
 import platform.Foundation.NSNumberFormatter
 import platform.Foundation.NSNumberFormatterDecimalStyle
@@ -45,7 +46,7 @@ actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
     val formatter = NSNumberFormatter().apply {
         numberStyle = NSNumberFormatterDecimalStyle
         when {
-            amount >= 10 || amount.compareTo(BigDecimal.ZERO) == 0  -> {
+            amount >= 1 || amount.compareTo(BigDecimal.ZERO) == 0  -> {
                 minimumFractionDigits = 3uL
                 maximumFractionDigits = 3uL
             }
@@ -62,6 +63,9 @@ actual fun formatBalanceNative(amount: BigDecimal, symbol: String): String {
 }
 
 actual fun formatPercentage(amount: BigDecimal): String {
+    if (amount.abs() <= "0.01".toBigDecimal()) {
+        return "0.00%"
+    }
     val formatter = NSNumberFormatter().apply {
         numberStyle = NSNumberFormatterDecimalStyle
         minimumFractionDigits = 2uL
