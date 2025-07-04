@@ -6,6 +6,7 @@ import com.nextnonce.app.core.network.backendHttpClient
 import com.nextnonce.app.core.network.safeCall
 import com.nextnonce.app.wallet.data.remote.RemoteWalletDataSource
 import com.nextnonce.app.wallet.data.remote.dto.WalletBalancesDto
+import com.nextnonce.app.wallet.data.remote.dto.WalletDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import org.koin.core.component.KoinComponent
@@ -19,6 +20,12 @@ class RemoteWalletDataSourceImpl : RemoteWalletDataSource, KoinComponent  {
     override suspend fun getBalances(address: String): Result<WalletBalancesDto, DataError.Remote> {
         return safeCall {
             backend.get("wallets/$address/balances")
+        }
+    }
+
+    override suspend fun get(address: String): Result<WalletDto, DataError.Remote> {
+        return safeCall {
+            backend.get("wallets/$address")
         }
     }
 }
