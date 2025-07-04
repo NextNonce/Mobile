@@ -112,7 +112,7 @@ class HomeViewModel(
                         // show that ordered list immediately, clear loading flag
                         _state.update { it.copy(
                             wallets = initialWalletsUI,
-                            areWalletsLoading = initialWalletsUI.isEmpty()
+                            areWalletsLoading = false
                         ) }
 
                         // 2) For each one, start loading its balance
@@ -127,7 +127,7 @@ class HomeViewModel(
     }
 
     private fun observeSingleWalletBalance( index: Int, pwm: PortfolioWalletModel) = viewModelScope.launch {
-        getWalletTotalBalanceUseCase.execute(pwm.wallet)
+        getWalletTotalBalanceUseCase.execute(pwm.wallet.id)
             .collect { result ->
                 result
                     .onSuccess { totalBalance ->
