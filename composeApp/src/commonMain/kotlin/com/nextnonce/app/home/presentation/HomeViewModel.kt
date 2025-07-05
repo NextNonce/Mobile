@@ -18,10 +18,14 @@ import com.nextnonce.app.portfolio.domain.GetPortfolioTotalBalanceUseCase
 import com.nextnonce.app.portfolio.domain.GetPortfolioWalletsUseCase
 import com.nextnonce.app.portfolio.domain.model.PortfolioWalletModel
 import com.nextnonce.app.wallet.domain.GetWalletTotalBalanceUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -108,46 +112,52 @@ class HomeViewModel(
      * 4.Continuously collects updates from the combined flow to show cached, then fresh data.
      * This provides immediate feedback while ensuring efficient state updates.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observePortfolioWallets(portfolioId: String) = viewModelScope.launch {
-        getPortfolioWalletsUseCase.execute(portfolioId)
-            .onStart { _state.update { it.copy(areWalletsLoading = true) } }
-            .collect { walletListResult ->
-                walletListResult.onSuccess { walletModels ->
-                    // 1. Create and display the initial list with loading placeholders immediately.
-                    val initialWalletsUI = walletModels.map { pwm ->
-                        createUiHomeWalletItem(pwm)
-                    }
-                    _state.update {
-                        it.copy(
-                            wallets = initialWalletsUI,
-                            areWalletsLoading = false // The list of names is now loaded.
-                        )
-                    }
+        getPortfolioWalletsUseCase.execute(portfolioId).flatMapLatest { walletListResult ->
+            when (walletListResult) {
+                is Result.Error -> {
+                    _state.update { it.copy(error = walletListResult.error.toUIText(), areWalletsLoading = false) }
+                    // Return a flow that does nothing to stop the chain.
+                    emptyFlow()
+                }
+                is Result.Success -> {
+                    val walletModels = walletListResult.data
 
-                    // If there are no wallets to fetch balances for, we're done.
-                    if (walletModels.isEmpty()) return@onSuccess
-
-                    // 2. Launch a single, non-blocking background job to fetch all balances.
-                    viewModelScope.launch {
+                    if (walletModels.isEmpty()) {
+                        // If the list is empty, just emit an empty list for the UI.
+                        flowOf(emptyList<UIHomeWalletItem>())
+                    } else {
+                        // Create the balance flows for the new list of wallets.
                         val balanceFlows = walletModels.map { pwm ->
                             getWalletTotalBalanceUseCase.execute(pwm.wallet.id)
                         }
 
-                        // `combine` will emit a full list of results once every balance flow has emitted at least once.
+                        // Combine them to get the latest list of balances.
                         val combinedBalancesFlow = combine(balanceFlows) { latestBalances ->
                             walletModels.mapIndexed { index, pwm ->
                                 createUiHomeWalletItem(pwm, latestBalances[index])
                             }
                         }
 
-                        combinedBalancesFlow.collect { updatedWalletsList ->
-                            // Update the state with the latest list, whether from cache or fresh from network.
-                            _state.update { it.copy(wallets = updatedWalletsList) }
-                        }
+                        // Create the initial placeholder list to show immediately.
+                        val initialPlaceholderList = walletModels.map { createUiHomeWalletItem(it, null) }
+
+                        // Use onStart to emit the placeholder list first, then continue with the combined flow.
+                        combinedBalancesFlow.onStart { emit(initialPlaceholderList) }
                     }
                 }
-                .onError { error ->
-                    _state.update { it.copy(error = error.toUIText(), areWalletsLoading = false) }
+            }
+        }
+            .onStart { _state.update { it.copy(areWalletsLoading = true) } }
+            .collect { finalWalletsList ->
+                // This single collect block now receives the initial placeholder list,
+                // and then any subsequent updates from the combined flow (cache then network).
+                _state.update {
+                    it.copy(
+                        wallets = finalWalletsList,
+                        areWalletsLoading = false // Loading is complete after the first emission.
+                    )
                 }
             }
     }
