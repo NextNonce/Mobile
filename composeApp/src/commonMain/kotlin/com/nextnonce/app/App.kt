@@ -17,10 +17,12 @@ import com.nextnonce.app.core.navigation.Auth
 import com.nextnonce.app.core.navigation.Home
 import com.nextnonce.app.core.navigation.Portfolio
 import com.nextnonce.app.core.navigation.Start
+import com.nextnonce.app.core.navigation.Wallet
 import com.nextnonce.app.home.presentation.HomeScreen
 import com.nextnonce.app.portfolio.presentation.AddPortfolioWalletScreen
 import com.nextnonce.app.start.presentation.StartScreen
 import com.nextnonce.app.theme.NextNonceTheme
+import com.nextnonce.app.wallet.presentation.WalletScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -66,8 +68,11 @@ fun App() {
 
             composable<Home> {
                 HomeScreen(
-                    onPortfolioClicked = {
-                        navController.navigate(Portfolio)
+                    onPortfolioClicked = { portfolioId ->
+                        navController.navigate(Portfolio(portfolioId)) {
+                            popUpTo(Home) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     },
                     onAddWalletClicked = { portfolioId ->
                         navController.navigate(AddWallet(portfolioId)) {
@@ -75,8 +80,11 @@ fun App() {
                             launchSingleTop = true
                         }
                     },
-                    onWalletClicked = { walletId ->
-
+                    onWalletClicked = { walletId, walletName ->
+                        navController.navigate(Wallet(walletId, walletName)) {
+                            popUpTo(Home) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     },
                 )
             }
@@ -89,60 +97,32 @@ fun App() {
                         navController.navigateUp()
                     },
                     onWalletAdded = {
-                        // Handle wallet added action
-                        /*navController.navigate(Home) {
-                            popUpTo(AddWallet) { inclusive = true }
-                            launchSingleTop = true
-                        }*/
-                        val addWalletRoute = navBackStackEntry.toRoute<AddWallet>()
-
-                        navController.navigate(Home) {
-                            // Change popUpTo to use the route object, not the class name
-                            popUpTo(addWalletRoute) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
+                        navController.navigateUp()
                     }
                 )
             }
 
-            composable<Portfolio> {
+            composable<Portfolio> { navBackStackEntry ->
+                val portfolioId = navBackStackEntry.toRoute<Portfolio>().portfolioId
                 PortfolioScreen(
-                    onNavigateBackClicked = {
+                    id = portfolioId,
+                    onBackClicked = {
                         navController.navigateUp()
-                    },
-                    onTokenItemClicked = { tokenId ->
-                        // Handle token item click action
                     },
                 )
             }
 
-//                composable<Token> {
-//                    TokensListScreen(navController)
-//                }
+            composable<Wallet> { navBackStackEntry ->
+                val walletId = navBackStackEntry.toRoute<Wallet>().walletId
+                val walletName = navBackStackEntry.toRoute<Wallet>().walletName
+                WalletScreen(
+                    id = walletId,
+                    name = walletName,
+                    onBackClicked = {
+                        navController.navigateUp()
+                    }
+                )
+            }
         }
     }
 }
-
-
-/*
-var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
-* */
