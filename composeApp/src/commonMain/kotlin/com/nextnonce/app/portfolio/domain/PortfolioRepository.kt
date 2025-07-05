@@ -21,5 +21,5 @@ interface PortfolioRepository {
         id: String
     ): Flow<Result<List<PortfolioWalletModel>, DataError>>
 
-    fun cachedBalancesFlow(id: String): Flow<Result<PortfolioBalancesModel, DataError>>
+    suspend fun cachedBalancesFlow(id: String): Flow<Result<PortfolioBalancesModel, DataError>>
 }
