@@ -90,6 +90,12 @@ fun LazyListScope.assetBalanceList(
     items(
         items = assetBalances,
         key = { it.id }, // Use the id as a key for each item
+        contentType = { item ->
+            when (item) {
+                is UITokenBalanceListItem -> "token"
+                is UIUnifiedTokenBalanceListItem -> "unified_token"
+            }
+        }
     ) { assetBalance ->
         when (assetBalance) {
             is UITokenBalanceListItem -> {
