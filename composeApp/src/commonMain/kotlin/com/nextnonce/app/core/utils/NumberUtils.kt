@@ -18,3 +18,16 @@ fun BigDecimal?.toSign(): NumberSign? {
         }
     }
 }
+
+fun String.toSign(): NumberSign? {
+    if (this.isEmpty()) return null
+    return this.let {
+        when(it[0]) {
+            '-' -> NumberSign.NEGATIVE
+            '+' -> NumberSign.POSITIVE
+            else -> {
+                NumberSign.ZERO
+            }
+        }
+    }
+}
