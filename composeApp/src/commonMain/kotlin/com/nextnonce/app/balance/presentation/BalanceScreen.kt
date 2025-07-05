@@ -55,9 +55,12 @@ import com.nextnonce.app.core.presentation.HighQualityPlatformImage
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
 
 @Composable
-fun AssetBalanceList(
+fun BalanceScreen(
+    totalBalance: @Composable () -> Unit,
     assetBalances: List<UIAssetBalanceListItem>,
 ) {
+    val kamelConfig: KamelConfig = koinInject()
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -166,114 +169,57 @@ private fun TokenIconWithChain(
     chainLogoUrl: String,
     modifier: Modifier = Modifier,
 ) {
-    /*HighQualityAsyncImage(
-        imageUrl = assetLogoUrl!!,
-        //size = 48.dp,
-        size = 48.dp,
-        modifier = Modifier
-            //.fillMax()
-            .clip(CircleShape)
-    )*/
     Box(
         modifier = modifier.size(48.dp)
     ) {
-        // Main Token Icon (or placeholder)
+        val density = LocalDensity.current
+        val targetPx = remember(density) { with(density) { 48.dp.roundToPx() } }
         if (assetLogoUrl != null) {
-            HighQualityPlatformImage(
-                imageUrl = assetLogoUrl,
-                size = 48.dp,
+            val tokenResource = asyncPainterResource(
+                data = assetLogoUrl,
+                maxBitmapDecodeSize = IntSize(targetPx, targetPx),
+            )
+            KamelImage(
+                resource = { tokenResource },
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                alpha = DefaultAlpha
             )
         } else {
             Box(
                 modifier = Modifier
-                    .clip(CircleShape)
                     .fillMaxSize()
+                    .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             )
         }
 
         Box(
             modifier = Modifier
-                .align(Alignment.BottomEnd) // Position in the bottom-right corner
+                .align(Alignment.BottomEnd)
                 .offset(x = 2.dp, y = 2.dp)
                 .clip(CircleShape)
                 .size(21.4.dp) // Total size of the chain icon including its border
                 .background(MaterialTheme.colorScheme.background), // This creates the border
             contentAlignment = Alignment.Center // Center the actual icon inside this box
         ) {
-            HighQualityPlatformImage(
-                imageUrl = chainLogoUrl,
-                //size = 18.dp,
-                size = 72.dp,
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape)
-            )
-
-        }
-    }
-}
-
-/*@Composable
-private fun HighQualityAsyncImage(
-    imageUrl: String,
-    size: Dp,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalPlatformContext.current
-    val density = LocalDensity.current
-
-    val imageRequest = remember(imageUrl, size, density) {
-        // Calculate the exact pixel size needed for the current screen's density
-        val targetSize = with(density) { size.roundToPx() }
-        ImageRequest.Builder(context)
-            .data(imageUrl)
-            .size(Size(targetSize, targetSize)) // Request the image at the exact pixel size
-            .precision(Precision.EXACT) // Instructs Coil to respect the exact size.
-            .build()
-    }
-
-    /*AsyncImage(
-        model = imageRequest,
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
-        modifier = modifier,
-        filterQuality = FilterQuality.High // Use the best scaling algorithm
-    )*/
-    /*val painter = rememberAsyncImagePainter(model = imageRequest)
-
-    // Draw the image on a Canvas only when it's successfully loaded
-    if (painter.state is AsyncImagePainter.State.Success) {
-        val imageBitmap = (painter.state as AsyncImagePainter.State.Success).result.image.asBitmap()
-        Canvas(modifier = modifier) {
-            drawImage(
-                image = imageBitmap,
-                // Ensure the drawn image size matches the canvas size
-                dstSize = IntSize(this.size.width.toInt(), this.size.height.toInt()),
-                // Use the highest quality filtering algorithm for downscaling
+            val chainResource = asyncPainterResource(
+                data = chainLogoUrl,
                 filterQuality = FilterQuality.High
             )
+            KamelImage(
+                resource = { chainResource },
+                contentDescription = null,
+                modifier = Modifier
+                    .size(18.4.dp),
+                contentScale = ContentScale.Crop,
+            )
         }
-    } else {
-        // Optional: Show a placeholder while loading or on error
-        Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainer))
-    }*/
-    Image(
-        painter = rememberAsyncImagePainter(
-            model = imageRequest,
-            filterQuality = FilterQuality.None
-        ),
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = ContentScale.None
-    )
+    }
 }
-*/
-
-
 
 @Composable
 fun EmptySection() {
