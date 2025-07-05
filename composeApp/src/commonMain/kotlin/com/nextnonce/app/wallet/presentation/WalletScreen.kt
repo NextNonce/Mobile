@@ -62,9 +62,9 @@ fun WalletScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Use Scaffold's padding
-                .padding(horizontal = 12.dp), // Apply your own screen padding
-            verticalArrangement = Arrangement.spacedBy(12.dp) // Space between items
+                .padding(paddingValues)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (state.error != null){
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -88,52 +88,6 @@ fun WalletScreen(
                 LoadingOverlay()
             }
         }
-    }
-}
-
-@Composable
-fun TotalWalletBalanceItem(
-    state: WalletState,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentWidth(Alignment.CenterHorizontally)
-    ) {
-        val totalBalance = state.uiWalletTotalBalance
-        val totalBalanceText = totalBalance.formatedBalanceQuote ?: ""
-
-        val totalBalanceChangeText =
-            (totalBalance.formattedBalanceQuoteChange ?: "") +
-                    (if (totalBalance.formatedChangePercent == null)
-                        ""
-                    else {
-                        " (${totalBalance.formatedChangePercent})"
-                    })
-        Text(
-            text = totalBalanceText,
-            style = MaterialTheme.typography.headlineLarge,
-            fontSize = totalBalanceText.fontSizeByLength,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = Modifier
-                .padding(top = 16.dp, bottom = 2.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-        val customColors = LocalNextNonceColorsPalette.current
-        Text(
-            text = totalBalanceChangeText,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            color = when (totalBalance.changePercentSign) {
-                NumberSign.POSITIVE -> customColors.profitGreen
-                NumberSign.NEGATIVE -> customColors.lossRed
-                NumberSign.ZERO -> MaterialTheme.colorScheme.onSurfaceVariant
-                null -> MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            modifier = Modifier
-                .padding(top = 2.dp, bottom = 20.dp)
-                .align(Alignment.CenterHorizontally)
-        )
     }
 }
 
@@ -198,4 +152,50 @@ private fun WalletTopBar(
             containerColor = Color.Transparent
         )
     )
+}
+
+@Composable
+fun TotalWalletBalanceItem(
+    state: WalletState,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentWidth(Alignment.CenterHorizontally)
+    ) {
+        val totalBalance = state.uiWalletTotalBalance
+        val totalBalanceText = totalBalance.formatedBalanceQuote ?: ""
+
+        val totalBalanceChangeText =
+            (totalBalance.formattedBalanceQuoteChange ?: "") +
+                    (if (totalBalance.formatedChangePercent == null)
+                        ""
+                    else {
+                        " (${totalBalance.formatedChangePercent})"
+                    })
+        Text(
+            text = totalBalanceText,
+            style = MaterialTheme.typography.headlineLarge,
+            fontSize = totalBalanceText.fontSizeByLength,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier
+                .padding(top = 16.dp, bottom = 2.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+        val customColors = LocalNextNonceColorsPalette.current
+        Text(
+            text = totalBalanceChangeText,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = when (totalBalance.changePercentSign) {
+                NumberSign.POSITIVE -> customColors.profitGreen
+                NumberSign.NEGATIVE -> customColors.lossRed
+                NumberSign.ZERO -> MaterialTheme.colorScheme.onSurfaceVariant
+                null -> MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            modifier = Modifier
+                .padding(top = 2.dp, bottom = 20.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
 }
