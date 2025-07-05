@@ -12,7 +12,7 @@ interface WalletRepository {
         walletId: String
     ): Result<WalletModel, DataError>
 
-    fun balancesFlow(
+    suspend fun balancesFlow(
         walletId: String
     ): Flow<Result<WalletBalancesModel, DataError>>
 }
