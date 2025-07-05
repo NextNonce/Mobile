@@ -1,17 +1,13 @@
 package com.nextnonce.app.balance.presentation
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,44 +16,39 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import coil3.request.allowConversionToBitmap
-import coil3.request.maxBitmapSize
-import coil3.size.Precision
-import coil3.size.Size
 import com.nextnonce.app.core.enums.NumberSign
-import com.nextnonce.app.core.presentation.HighQualityPlatformImage
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
+import io.kamel.core.config.KamelConfig
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
+import io.kamel.image.config.LocalKamelConfig
+import org.koin.compose.koinInject
 
 @Composable
 fun BalanceScreen(
     totalBalance: @Composable () -> Unit,
     assetBalances: List<UIAssetBalanceListItem>,
+    onToggleItem: (String) -> Unit = {}, // The parent is responsible for handling this
+    onTokenClick: (String) -> Unit = {},
 ) {
     val kamelConfig: KamelConfig = koinInject()
 
@@ -65,7 +56,6 @@ fun BalanceScreen(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
         if (assetBalances.isEmpty()) {
             EmptySection()
@@ -83,6 +73,47 @@ fun BalanceScreen(
                     val assetBalance = assetBalances[index]
                     AssetBalanceListItem(
                         assetBalance = assetBalance
+            CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    overscrollEffect = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    item {
+                        totalBalance()
+                    }
+                    assetBalanceList(
+                        assetBalances = assetBalances,
+                        onTokenClick = onTokenClick,
+                        onToggleItem = onToggleItem
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ExpandableUnifiedTokenItem(
+    unifiedToken: UIUnifiedTokenBalanceListItem,
+    onToggle: () -> Unit
+) {
+    Column {
+        // The main clickable row for the unified token
+        AssetBalanceListItem(
+            assetBalance = unifiedToken,
+            onClick = onToggle
+        )
+
+        // The animated, nested list of sub-tokens
+        AnimatedVisibility(visible = unifiedToken.isExpanded) {
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                unifiedToken.tokens.forEach { subToken ->
+                    AssetBalanceListItem(
+                        assetBalance = subToken,
+                        isInnerItem = true
                     )
                 }
             }
@@ -93,6 +124,8 @@ fun BalanceScreen(
 @Composable
 private fun AssetBalanceListItem(
     assetBalance: UIAssetBalanceListItem,
+    onClick: () -> Unit = {},
+    isInnerItem: Boolean = false, // Used to determine if this is a sub-token item
 ) {
     Row (
         verticalAlignment = Alignment.CenterVertically,
@@ -104,6 +137,10 @@ private fun AssetBalanceListItem(
 //            )
             .padding(6.dp)
     ) {
+        if (isInnerItem) {
+            // Indent the inner item
+            Spacer(modifier = Modifier.width(12.dp))
+        }
         TokenIconWithChain(
             assetLogoUrl = assetBalance.assetLogoUrl,
             chainLogoUrl = assetBalance.chainLogoUrl
