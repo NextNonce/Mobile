@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 class GetPortfolioAssetBalancesUseCase(
     private val portfolioRepository: PortfolioRepository
 ) {
-    fun execute(id: String): Flow<Result<List<AssetBalance>, DataError>> {
+    suspend fun execute(id: String): Flow<Result<List<AssetBalance>, DataError>> {
         return portfolioRepository
             .cachedBalancesFlow(id)
             .map { result: Result<PortfolioBalancesModel, DataError> ->
