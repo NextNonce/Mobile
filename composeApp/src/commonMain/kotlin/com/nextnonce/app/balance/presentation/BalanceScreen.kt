@@ -89,6 +89,7 @@ fun LazyListScope.assetBalanceList(
 ) {
     items(
         items = assetBalances,
+        key = { it.id }, // Use the id as a key for each item
     ) { assetBalance ->
         when (assetBalance) {
             is UITokenBalanceListItem -> {
