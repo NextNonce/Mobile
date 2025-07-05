@@ -15,6 +15,13 @@ plugins {
 }
 
 kotlin {
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.get().compilerOptions {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
 
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -72,6 +79,8 @@ kotlin {
             implementation(libs.coil.core)
             implementation(libs.coil.svg)
             implementation(libs.coil.network.ktor)
+
+            implementation(libs.kamel)
 
             implementation(libs.bignum)
             implementation(libs.bignum.serialization)

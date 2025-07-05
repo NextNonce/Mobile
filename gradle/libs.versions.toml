@@ -27,6 +27,7 @@ buildkonfig = "0.17.1"
 bignum  = "0.3.10"
 kermit = "2.0.6"
 supabase = "3.2.0"
+kamel = "1.0.5"
 
 
 [libraries]
@@ -77,6 +78,9 @@ coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil-compose" }
 coil-core = { module = "io.coil-kt.coil3:coil", version.ref = "coil-compose" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil-compose" }
+
+# Kamel Libraries
+kamel = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 
 # Biometry Libraries
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometry" }
