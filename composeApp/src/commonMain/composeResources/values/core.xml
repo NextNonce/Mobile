@@ -15,4 +15,7 @@
     <string name="error_weak_password">Your password is too weak.</string>
     <string name="error_account_exists">An account with this email already exists.</string>
 
+    <string name="back">Back</string>
+
+
 </resources>

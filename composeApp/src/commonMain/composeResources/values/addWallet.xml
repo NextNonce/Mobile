@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="enter_wallet_address">Enter a wallet address</string>
+    <string name="wallet_name">Name (Optional)</string>
+    <string name="continue_text">Continue</string>
+    <string name="address">Address</string>
+</resources>

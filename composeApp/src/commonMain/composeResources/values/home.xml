@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="portfolio">Portfolio</string>
+    <string name="view_portfolio_details">View Portfolio Details</string>
+    <string name="view_wallet_details">View Wallet Details</string>
+    <string name="today">Today</string>
+    <string name="my_wallets">My Wallets</string>
+    <string name="add_wallet">Add Wallet</string>
+</resources>
