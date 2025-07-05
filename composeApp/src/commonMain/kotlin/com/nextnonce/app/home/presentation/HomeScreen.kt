@@ -50,7 +50,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
-    onPortfolioClicked: () -> Unit = {},
+    onPortfolioClicked: (String) -> Unit = {},
     onAddWalletClicked: (String) -> Unit = {},
     onWalletClicked: (String, String?) -> Unit = { walletId, walletName -> }
 ) {
@@ -86,14 +86,20 @@ fun HomeScreen(
 
 // --- Reusable UI Components ---
 @Composable
-fun PortfolioSummaryCard(state: HomeState, onClick: () -> Unit) {
+fun PortfolioSummaryCard(state: HomeState, onClick: (String) -> Unit) {
     val cardShape = RoundedCornerShape(20.dp)
     val portfolio = state.portfolio
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(cardShape)
-            .clickable(onClick = onClick),
+            .clickable(
+                onClick = {
+                    if (!portfolio.isLoading && portfolio.id != null) {
+                        onClick(portfolio.id)
+                    }
+                }
+            ),
         shape = cardShape,
     ) {
         Column(
