@@ -5,3 +5,11 @@ enum class PortfolioAccess {
     PUBLIC,
     UNLISTED,
 }
+
+fun PortfolioAccess.toStringValue(): String {
+    return when (this) {
+        PortfolioAccess.PRIVATE -> "Private"
+        PortfolioAccess.PUBLIC -> "Public"
+        PortfolioAccess.UNLISTED -> "Unlisted"
+    }
+}
