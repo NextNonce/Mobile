@@ -12,7 +12,7 @@ class GetWalletAssetBalancesUseCase(
     private val walletRepository: WalletRepository
 ) {
 
-    fun execute(
+    suspend fun execute(
         walletId: String
     ): Flow<Result<List<AssetBalance>, DataError>> {
         return walletRepository

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 class GetWalletTotalBalanceUseCase(
     private val walletRepository: WalletRepository
 ) {
-    fun execute(
+    suspend fun execute(
         walletId: String
     ): Flow<Result<TotalBalance, DataError>> {
         return walletRepository
