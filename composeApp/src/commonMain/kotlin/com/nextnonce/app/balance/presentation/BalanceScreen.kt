@@ -61,18 +61,6 @@ fun BalanceScreen(
             EmptySection()
             return@Box
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(
-                    count = assetBalances.size,
-                    key = { index -> assetBalances[index].id }
-                ) { index ->
-                    val assetBalance = assetBalances[index]
-                    AssetBalanceListItem(
-                        assetBalance = assetBalance
             CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -94,6 +82,32 @@ fun BalanceScreen(
     }
 }
 
+fun LazyListScope.assetBalanceList(
+    assetBalances: List<UIAssetBalanceListItem>,
+    onTokenClick: (String) -> Unit,
+    onToggleItem: (String) -> Unit
+) {
+    items(
+        items = assetBalances,
+    ) { assetBalance ->
+        when (assetBalance) {
+            is UITokenBalanceListItem -> {
+                // Single token
+                AssetBalanceListItem(
+                    assetBalance = assetBalance,
+                    onClick = { onTokenClick(assetBalance.id) }
+                )
+            }
+            is UIUnifiedTokenBalanceListItem -> {
+                // Expandable Unified Token
+                ExpandableUnifiedTokenItem(
+                    unifiedToken = assetBalance,
+                    onToggle = { onToggleItem(assetBalance.id) }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 private fun ExpandableUnifiedTokenItem(
@@ -131,10 +145,7 @@ private fun AssetBalanceListItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-//            .combinedClickable(
-//                onClick = { onTokenClick(token.id) },
-//                onLongClick = { onTokenLongPressed(token.id) }
-//            )
+            .clickable(onClick = onClick)
             .padding(6.dp)
     ) {
         if (isInnerItem) {
