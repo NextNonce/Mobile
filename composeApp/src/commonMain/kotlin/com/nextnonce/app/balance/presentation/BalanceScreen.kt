@@ -41,6 +41,9 @@ import io.kamel.core.config.KamelConfig
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import io.kamel.image.config.LocalKamelConfig
+import nextnonce.composeapp.generated.resources.Res
+import nextnonce.composeapp.generated.resources.there_are_no_tokens
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -176,7 +179,6 @@ private fun AssetBalanceListItem(
             Text(
                 text = assetBalance.formatedBalanceNative,
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                //color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -286,7 +288,7 @@ fun EmptySection() {
             .padding(32.dp)
     ) {
         Text(
-            text = "There are no tokens",
+            text = stringResource(Res.string.there_are_no_tokens),
             fontSize = MaterialTheme.typography.bodyLarge.fontSize,
             color = MaterialTheme.colorScheme.onBackground,
         )

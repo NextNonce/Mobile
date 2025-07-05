@@ -35,6 +35,8 @@ import com.nextnonce.app.core.presentation.LoadingOverlay
 import com.nextnonce.app.core.utils.fontSizeByLength
 import com.nextnonce.app.core.utils.formatAddress
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
+import nextnonce.composeapp.generated.resources.Res
+import nextnonce.composeapp.generated.resources.back
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -144,7 +146,7 @@ private fun WalletTopBar(
             IconButton(onClick = onBackClicked) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(Res.string.back),
                 )
             }
         },

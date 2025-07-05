@@ -45,6 +45,14 @@ import com.nextnonce.app.core.presentation.LoadingOverlay
 import com.nextnonce.app.core.presentation.ShimmerLoadingIndicator
 import com.nextnonce.app.core.utils.formatAddress
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
+import nextnonce.composeapp.generated.resources.Res
+import nextnonce.composeapp.generated.resources.add_wallet
+import nextnonce.composeapp.generated.resources.my_wallets
+import nextnonce.composeapp.generated.resources.portfolio
+import nextnonce.composeapp.generated.resources.today
+import nextnonce.composeapp.generated.resources.view_portfolio_details
+import nextnonce.composeapp.generated.resources.view_wallet_details
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -110,13 +118,13 @@ fun PortfolioSummaryCard(state: HomeState, onClick: (String) -> Unit) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Portfolio",
+                    text = stringResource(Res.string.portfolio),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "View Portfolio Details",
+                    contentDescription = stringResource(Res.string.view_portfolio_details),
                     modifier = Modifier.size(22.dp).padding(start = 4.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -159,7 +167,7 @@ fun PortfolioSummaryCard(state: HomeState, onClick: (String) -> Unit) {
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = "Today",
+                    text = stringResource(Res.string.today),
                     style = MaterialTheme.typography.bodySmall,
                     color = textColor,
                     fontWeight = FontWeight.SemiBold,
@@ -180,7 +188,7 @@ fun MyWalletsHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "My Wallets",
+            text = stringResource(Res.string.my_wallets),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
         )
@@ -193,7 +201,7 @@ fun MyWalletsHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add Wallet",
+                contentDescription = stringResource(Res.string.add_wallet),
                 modifier = Modifier.size(28.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -302,7 +310,7 @@ fun WalletItem(walletItem: UIHomeWalletItem, onClick: () -> Unit) {
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "View Wallet Details",
+                contentDescription = stringResource(Res.string.view_wallet_details),
                 modifier = Modifier.size(26.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

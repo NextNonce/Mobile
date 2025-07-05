@@ -36,6 +36,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import nextnonce.composeapp.generated.resources.Res
+import nextnonce.composeapp.generated.resources.address
+import nextnonce.composeapp.generated.resources.back
+import nextnonce.composeapp.generated.resources.continue_text
+import nextnonce.composeapp.generated.resources.enter_wallet_address
+import nextnonce.composeapp.generated.resources.wallet_name
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -106,7 +112,7 @@ private fun AddWalletTopBar(
             IconButton(onClick = onBackClicked) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(Res.string.back),
                 )
             }
         },
@@ -131,7 +137,7 @@ private fun AddWalletContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Enter a wallet address",
+            text = stringResource(Res.string.enter_wallet_address),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
@@ -152,7 +158,7 @@ private fun AddWalletContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            placeholder = { Text("Name (Optional)") },
+            placeholder = { Text(stringResource(Res.string.wallet_name)) },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
         )
@@ -194,7 +200,7 @@ private fun BoxScope.AddWalletContinueButton(
                 )
             } else {
                 Text(
-                    text = "Continue",
+                    text = stringResource(Res.string.continue_text),
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -223,7 +229,7 @@ private fun AddressInputField(
                     onFocusLost()
                 }
             },
-        placeholder = { Text("Address", style = MaterialTheme.typography.bodyLarge) },
+        placeholder = { Text(stringResource(Res.string.address), style = MaterialTheme.typography.bodyLarge) },
         shape = RoundedCornerShape(12.dp),
         isError = isError,
         singleLine = true,
