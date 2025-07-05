@@ -9,7 +9,6 @@ import com.nextnonce.app.auth.domain.SignUpWithEmailUseCase
 import com.nextnonce.app.core.utils.toUIText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -20,9 +19,6 @@ class AuthViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthState())
     val state = _state
-        .onStart {
-
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

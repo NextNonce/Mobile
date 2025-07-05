@@ -12,13 +12,10 @@ object Auth
 object Home
 
 @Serializable
-object AddWallet
+data class AddWallet(val portfolioId: String)
 
 @Serializable
-object Portfolio
+data class Portfolio(val portfolioId: String)
 
 @Serializable
-object Token
-
-@Serializable
-object Settings
+data class Wallet(val walletId: String, val walletName: String? = null)
