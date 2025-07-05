@@ -5,6 +5,7 @@ import com.nextnonce.app.core.domain.EmptyResult
 import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.core.domain.map
 import com.nextnonce.app.core.utils.BASE_CACHED_REQUEST_DELAY
+import com.nextnonce.app.core.utils.MAX_CACHED_BALANCES_DELAY
 import com.nextnonce.app.core.utils.MAX_CACHED_BALANCES_REQUESTS
 import com.nextnonce.app.logging.AppLogger
 import com.nextnonce.app.portfolio.data.mapper.toCreatePortfolioWalletDto
@@ -26,11 +27,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class PortfolioRepositoryImpl(
     private val remoteDataSource: RemotePortfolioDataSource,
@@ -38,6 +42,10 @@ class PortfolioRepositoryImpl(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val refreshWallets = mutableMapOf<String, MutableSharedFlow<Unit>>()
+
+    private val cachedBalancesFlowMutex = Mutex()
+    private val cachedBalancesFlows =
+        mutableMapOf<String, SharedFlow<Result<PortfolioBalancesModel, DataError>>>()
 
     private fun triggerFor(id: String) =
         refreshWallets.getOrPut(id) {
@@ -104,39 +112,63 @@ class PortfolioRepositoryImpl(
         }
     }
 
+    override suspend fun cachedBalancesFlow(id: String): Flow<Result<PortfolioBalancesModel, DataError>> {
+        // First, check without locking for performance. This is safe because map reads are thread-safe.
+        cachedBalancesFlows[id]?.let { return it }
+
+        // If not found, acquire a lock to create it. This ensures only one thread creates the flow.
+        return cachedBalancesFlowMutex.withLock {
+            cachedBalancesFlows.getOrPut(id) {
+                // Double-check inside the lock in case another thread created it while we were waiting.
+                createAndShareCachedBalancesFlow(id)
+            }
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun cachedBalancesFlow(id: String): Flow<Result<PortfolioBalancesModel, DataError>> {
-        return triggerFor(id)
+    private fun createAndShareCachedBalancesFlow(id: String): SharedFlow<Result<PortfolioBalancesModel, DataError>> {
+        // 1. Define your original "cold" flow that does the polling.
+        val sourceFlow = triggerFor(id)
             .onStart { emit(Unit) }
-            .flatMapLatest { flow {
-                var dtoRes: Result<PortfolioBalancesDto, DataError> = Result.Error(DataError.Remote.UNKNOWN)
+            .flatMapLatest {
+                flow {
+                    var dtoRes: Result<PortfolioBalancesDto, DataError> = Result.Error(DataError.Remote.UNKNOWN)
 
-                suspend fun fetchAndEmit(): Result<PortfolioBalancesModel, DataError> {
-                    dtoRes = remoteDataSource.getCachedBalances(id)
-                    val modelRes = dtoRes.map { it.toPortfolioBalancesModel() }
-                    if (modelRes is Result.Error) {
-                        AppLogger.e { "Error fetching cached balances for id $id: ${modelRes.error}" }
-                    } else {
-                        AppLogger.d { "Fetched cached balances for id $id" }
-                    }
-                    emit(modelRes)
-                    return modelRes
-                }
-
-                var requestDelay = BASE_CACHED_REQUEST_DELAY
-                for (i in 0 until MAX_CACHED_BALANCES_REQUESTS) {
-                    fetchAndEmit()
-                    // only compare on Success
-                    if (dtoRes is Result.Success) {
-                        val isActual = (dtoRes as Result.Success<PortfolioBalancesDto>).data.actual
-                        if (isActual) {
-                            break
+                    suspend fun fetchAndEmit(): Result<PortfolioBalancesModel, DataError> {
+                        dtoRes = remoteDataSource.getCachedBalances(id)
+                        val modelRes = dtoRes.map { it.toPortfolioBalancesModel() }
+                        if (modelRes is Result.Error) {
+                            AppLogger.e { "Error fetching cached balances for id $id: ${modelRes.error}" }
+                        } else {
+                            AppLogger.d { "Fetched cached balances for id $id" }
                         }
+                        emit(modelRes)
+                        return modelRes
                     }
-                    delay(requestDelay)
-                    requestDelay *= 2 // Exponential backoff
+
+                    while (true) {
+                        var requestDelay = BASE_CACHED_REQUEST_DELAY
+                        for (i in 0 until MAX_CACHED_BALANCES_REQUESTS) {
+                            fetchAndEmit()
+                            if (dtoRes is Result.Success) {
+                                val isActual = (dtoRes as Result.Success<PortfolioBalancesDto>).data.actual
+                                if (isActual) {
+                                    break
+                                }
+                            }
+                            delay(requestDelay)
+                            requestDelay *= 2
+                        }
+                        delay(MAX_CACHED_BALANCES_DELAY)
+                    }
                 }
             }
-        }.shareIn(scope, SharingStarted.Eagerly, replay = 1)
+
+        // 2. Convert the cold flow into a hot, shared StateFlow.
+        return sourceFlow.shareIn(
+            scope = scope, // Use the repository's private scope.
+            started = SharingStarted.WhileSubscribed(5000L), // Starts on first subscriber, stops 5s after the last one leaves.
+            replay = 1 // Replays the most recent value to new subscribers.
+        )
     }
 }
