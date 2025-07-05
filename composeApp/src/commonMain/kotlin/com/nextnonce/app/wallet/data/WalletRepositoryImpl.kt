@@ -3,6 +3,7 @@ package com.nextnonce.app.wallet.data
 import com.nextnonce.app.core.domain.DataError
 import com.nextnonce.app.core.domain.Result
 import com.nextnonce.app.core.domain.wallet.toWallet
+import com.nextnonce.app.core.utils.BASE_REFRESH_DELAY
 import com.nextnonce.app.core.utils.CACHE_AGE_ONE_MINUTE
 import com.nextnonce.app.logging.AppLogger
 import com.nextnonce.app.wallet.data.local.WalletBalancesCacheDao
@@ -17,11 +18,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
+import kotlin.random.Random
 
 class WalletRepositoryImpl(
     private val remoteDataSource: RemoteWalletDataSource,
@@ -29,6 +35,10 @@ class WalletRepositoryImpl(
 ) : WalletRepository {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private val balancesFlowMutex = Mutex()
+    private val balancesFlows =
+        mutableMapOf<String, SharedFlow<Result<WalletBalancesModel, DataError>>>()
 
     override suspend fun getWalletById(
         walletId: String
@@ -55,9 +65,22 @@ class WalletRepositoryImpl(
         }
     }
 
-    override fun balancesFlow(
+    override suspend fun balancesFlow(
         walletId: String
-    ): Flow<Result<WalletBalancesModel, DataError>> = flow {
+    ): Flow<Result<WalletBalancesModel, DataError>>{
+
+        balancesFlows[walletId]?.let { return it }
+
+        return balancesFlowMutex.withLock {
+            balancesFlows.getOrPut(walletId) {
+                createAndShareBalancesFlow(walletId)
+            }
+        }
+    }
+
+    private fun createAndShareBalancesFlow(
+        walletId: String
+    ): SharedFlow<Result<WalletBalancesModel, DataError>> = flow {
         val cached = walletBalancesCacheDao.getBalancesCache(walletId)
         if (cached != null) {
             AppLogger.d {
@@ -71,36 +94,51 @@ class WalletRepositoryImpl(
                 AppLogger.d {
                     "Using cached balances for wallet $walletId, which is still fresh."
                 }
-                return@flow
             }
         }
 
         val wallet = walletId.toWallet()
             ?: return@flow emit(Result.Error(DataError.Local.UNKNOWN))
 
-        when (val dtoResult = remoteDataSource.getBalances(wallet.address)) {
-            is Result.Error -> emit(Result.Error(dtoResult.error))
-            is Result.Success -> {
-                val dto = dtoResult.data
-                AppLogger.d {
-                    "Fetched fresh balances for wallet $walletId: ${dto.totalBalance}"
-                }
+        while (true) {
+            // in order to avoid hammering the server
+            when (val dtoResult = remoteDataSource.getBalances(wallet.address)) {
+                is Result.Error -> emit(Result.Error(dtoResult.error))
+                is Result.Success -> {
+                    val dto = dtoResult.data
+                    AppLogger.d {
+                        "Fetched fresh balances for wallet $walletId: ${dto.totalBalance}"
+                    }
 
-                // Emit fresh
-                emit(Result.Success(dto.toWalletBalancesModel()))
+                    // Emit fresh
+                    emit(Result.Success(dto.toWalletBalancesModel()))
 
-                AppLogger.d {
-                    "Caching fresh balances for wallet $walletId."
+                    AppLogger.d {
+                        "Caching fresh balances for wallet $walletId."
+                    }
+                    // Cache the fresh DTO
+                    walletBalancesCacheDao.upsertBalancesCache(
+                        WalletBalancesCacheEntity(walletId, now(), dto)
+                    )
                 }
-                // Cache the fresh DTO
-                walletBalancesCacheDao.upsertBalancesCache(
-                    WalletBalancesCacheEntity(walletId, now(), dto)
-                )
             }
+            // in order to avoid hammering the server
+            randomDelay()
         }
-    }.shareIn(scope, SharingStarted.Eagerly, replay = 1)
+    }.shareIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        replay = 1
+    )
 
     private fun now(): Long {
         return Clock.System.now().toEpochMilliseconds()
+    }
+
+    private suspend fun randomDelay() {
+        delay(
+            Random.nextLong
+                (BASE_REFRESH_DELAY, 2 * BASE_REFRESH_DELAY)
+        )
     }
 }
