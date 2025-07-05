@@ -3,8 +3,8 @@ package com.nextnonce.app.wallet.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.nextnonce.app.balance.presentation.UIUnifiedTokenBalanceListItem
 import com.nextnonce.app.balance.presentation.mapper.toUIAssetBalanceListItem
+import com.nextnonce.app.balance.presentation.toggleUnified
 import com.nextnonce.app.core.domain.onError
 import com.nextnonce.app.core.domain.onSuccess
 import com.nextnonce.app.core.domain.wallet.toStringValue
@@ -40,7 +40,6 @@ class WalletViewModel(
         )
 
     init {
-        // kick off loading without blocking the `state` flow
         viewModelScope.launch {
             launch { getWallet() }
             launch { getWalletTotalBalance() }
@@ -78,21 +77,19 @@ class WalletViewModel(
 
     private suspend fun getWalletTotalBalance() {
         getWalletTotalBalanceUseCase.execute(id)
-            .onStart {
-                _state.update { it.copy(error = null) }
-            }
             .collect { result ->
                 result.onSuccess { totalBalance ->
                     AppLogger.d {
                         "WalletViewModel: Successfully fetched total balance for wallet $id: $totalBalance"
                     }
                     _state.update { it ->
+                        val formatedChangePercent = formatPercentage(totalBalance.balanceQuoteChangePercent ?: BigDecimal.ZERO)
                         it.copy(
                             uiWalletTotalBalance = UIWalletTotalBalance(
                                 formatedBalanceQuote = formatQuote(totalBalance.balanceQuote),
                                 formattedBalanceQuoteChange = formatQuoteChange(totalBalance.balanceQuoteChange ?: BigDecimal.ZERO),
-                                formatedChangePercent = formatPercentage(totalBalance.balanceQuoteChangePercent ?: BigDecimal.ZERO),
-                                changePercentSign =  totalBalance.balanceQuoteChangePercent?.toSign()
+                                formatedChangePercent = formatedChangePercent,
+                                changePercentSign =  formatedChangePercent.toSign()
                             ),
                         )
                     }
@@ -143,22 +140,8 @@ class WalletViewModel(
     }
 
     fun expandUnifiedToken(tokenId: String) {
-        _state.update { currentState ->
-            val updatedAssetBalances = currentState.assetBalances.map { assetBalance ->
-                // Check if this is the item we want to expand/collapse
-                if (assetBalance is UIUnifiedTokenBalanceListItem) {
-                    if (assetBalance.id == tokenId) {
-                        // If it is, create a new instance with the toggled 'isExpanded' state
-                        assetBalance.copy(isExpanded = !assetBalance.isExpanded)
-                    } else {
-                        assetBalance.copy(isExpanded = false)
-                    }
-                } else {
-                    // Otherwise, return the item as is
-                    assetBalance
-                }
-            }
-            currentState.copy(assetBalances = updatedAssetBalances)
-        }
+        _state.update { it.copy(
+            assetBalances = it.assetBalances.toggleUnified(tokenId)
+        )}
     }
 }
