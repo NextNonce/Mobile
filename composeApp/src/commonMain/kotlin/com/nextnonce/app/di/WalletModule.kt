@@ -17,6 +17,10 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 
+/**
+ * Koin module for wallet-related dependencies.
+ * This module provides the repository, use cases, and view models for managing wallets and their balances.
+ */
 val walletModule = module {
     singleOf(::WalletRepositoryImpl).bind<WalletRepository>()
     single {

@@ -17,6 +17,10 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 
+/**
+ * Koin module for portfolio-related dependencies.
+ * This module provides the repository, use cases, and view models for managing portfolio and their wallets.
+ */
 val portfolioModule = module {
     singleOf(::PortfolioRepositoryImpl).bind<PortfolioRepository>()
     singleOf(::CreatePortfolioWalletUseCase)

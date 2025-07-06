@@ -11,6 +11,10 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 
+/**
+ * Koin module for user-related dependencies.
+ * This module provides the repository, use cases, and data sources for managing user data.
+ */
 val userModule = module {
     singleOf(::UserRepositoryImpl).bind<UserRepository>()
     singleOf(::CreateUserUseCase)

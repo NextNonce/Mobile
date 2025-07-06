@@ -24,6 +24,9 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 
+/**
+ * Koin module for authentication-related dependencies.
+ */
 val authModule = module {
     single<SupabaseClient> {
         AuthProvider.apply { init() }.client
