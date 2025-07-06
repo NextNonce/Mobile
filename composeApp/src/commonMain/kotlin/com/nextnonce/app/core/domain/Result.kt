@@ -1,5 +1,11 @@
 package com.nextnonce.app.core.domain
 
+/**
+ * Represents the result of an operation, which can either be a success with data or an error.
+ *
+ * @param D The type of data returned on success.
+ * @param E The type of error that can occur.
+ */
 sealed interface Result<out D, out E : Error> {
     data class Success<D>(val data: D) : Result<D, Nothing>
     data class Error<E : com.nextnonce.app.core.domain.Error>(val error: E) : Result<Nothing, E>

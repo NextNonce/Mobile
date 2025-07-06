@@ -19,6 +19,15 @@ fun BigDecimal?.toSign(): NumberSign? {
     }
 }
 
+/**
+ * Converts a String representation of a number to its corresponding NumberSign.
+ * The first character of the string determines the sign:
+ * - If it starts with '-', it returns NumberSign.NEGATIVE.
+ * - If it starts with '+', it returns NumberSign.POSITIVE.
+ * - If it starts with any other character or is empty, it returns NumberSign.ZERO.
+ *
+ * @return NumberSign corresponding to the first character of the string, or null if the string is empty.
+ */
 fun String.toSign(): NumberSign? {
     if (this.isEmpty()) return null
     return this.let {

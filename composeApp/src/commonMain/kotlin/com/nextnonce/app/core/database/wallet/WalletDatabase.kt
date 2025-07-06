@@ -8,6 +8,10 @@ import com.nextnonce.app.core.utils.BigDecimalConverters
 import com.nextnonce.app.wallet.data.local.WalletBalancesCacheDao
 import com.nextnonce.app.wallet.data.local.WalletBalancesCacheEntity
 
+/**
+ * WalletDatabase is the Room database for storing wallet balances.
+ * It contains a single table for caching wallet balances.
+ */
 @Database(entities = [
     WalletBalancesCacheEntity::class],
     version = 1)

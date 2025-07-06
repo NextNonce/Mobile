@@ -22,6 +22,14 @@ import io.ktor.client.plugins.logging.Logging
 
 
 object HttpClientFactory {
+    /**
+     * Creates an instance of [HttpClient] configured for the backend.
+     *
+     * @param engine The HTTP client engine to use.
+     * @param getBearerTokensUseCase Use case to retrieve bearer tokens.
+     * @param refreshBearerTokensUseCase Use case to refresh bearer tokens.
+     * @return Configured [HttpClient] instance.
+     */
     fun createBackend(
         engine: HttpClientEngine,
         getBearerTokensUseCase: GetBearerTokensUseCase,

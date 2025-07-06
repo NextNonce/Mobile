@@ -8,6 +8,10 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 
+/**
+ * AuthProvider is a singleton object that initializes the Supabase client with authentication capabilities.
+ * It uses the Supabase URL and Anon Key from the BuildKonfig.
+ */
 object AuthProvider {
     lateinit var client: SupabaseClient
         private set

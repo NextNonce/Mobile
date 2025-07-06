@@ -9,6 +9,13 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
 
+/**
+ * Executes a network call and returns a Result type.
+ * Handles exceptions and converts the HttpResponse to a Result type.
+ *
+ * @param execute A lambda function that performs the network call.
+ * @return A Result type containing either the parsed response body or an error.
+ */
 suspend inline fun <reified T> safeCall (
     execute: () -> HttpResponse
 ): Result<T, DataError.Remote> {
@@ -26,6 +33,14 @@ suspend inline fun <reified T> safeCall (
     return responseToResult(response)
 }
 
+
+/**
+ * Converts an HttpResponse to a Result type.
+ * Handles different HTTP status codes and returns appropriate Result.Error types.
+ *
+ * @param response The HttpResponse to convert.
+ * @return A Result type containing either the parsed response body or an error.
+ */
 suspend inline fun <reified T> responseToResult(
     response: HttpResponse
 ): Result<T, DataError.Remote> {
