@@ -24,6 +24,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing the state of a portfolio, fetching portfolio details,
+ * total balance, and asset balances.
+ *
+ * @property id The unique identifier of the portfolio.
+ * @property getDefaultPortfolioUseCase Use case for fetching the default portfolio.
+ * @property getPortfolioAssetBalancesUseCase Use case for fetching asset balances in the portfolio.
+ * @property getPortfolioTotalBalanceUseCase Use case for fetching the total balance of the portfolio.
+ */
 class PortfolioViewModel(
     private val id: String,
     private val getDefaultPortfolioUseCase: GetDefaultPortfolioUseCase,
@@ -46,7 +55,11 @@ class PortfolioViewModel(
         }
     }
 
-
+    /**
+     * Fetches the default portfolio and updates the state with the portfolio information.
+     * If successful, it updates the UIPortfolioInfo with the portfolio's ID, name, and access level.
+     * If an error occurs, it updates the state with the error message.
+     */
     private suspend fun getDefaultPortfolio() {
         val portfolio = getDefaultPortfolioUseCase.execute()
         portfolio
@@ -78,6 +91,11 @@ class PortfolioViewModel(
             }
     }
 
+    /**
+     * Fetches the total balance for the portfolio and updates the state with the results.
+     * If successful, it updates the UIPortfolioTotalBalance with formatted values.
+     * If an error occurs, it updates the state with the error message.
+     */
     private suspend fun getPortfolioTotalBalance() {
         getPortfolioTotalBalanceUseCase.execute(id)
             .collect { result ->
@@ -109,6 +127,9 @@ class PortfolioViewModel(
             }
     }
 
+    /**
+     * Fetches the asset balances for the portfolio and updates the state with the results.
+     */
     private suspend fun getAssetBalances() {
         getPortfolioAssetBalancesUseCase.execute(id)
             .onStart {
@@ -141,6 +162,11 @@ class PortfolioViewModel(
             }
     }
 
+    /**
+     * Expands or collapses a unified token balance item by toggling its expanded state.
+     * This function updates the state of the portfolio to reflect the change in the unified token's expanded state.
+     * @param tokenId The unique identifier of the unified token to be expanded or collapsed.
+     */
     fun expandUnifiedToken(tokenId: String) {
         _state.update { it.copy(
             assetBalances = it.assetBalances.toggleUnified(tokenId)

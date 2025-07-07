@@ -16,6 +16,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing the state of adding a wallet to a portfolio.
+ *
+ * @property createPortfolioWalletUseCase Use case for creating a portfolio wallet.
+ */
 class AddPortfolioWalletViewModel(
     private val createPortfolioWalletUseCase: CreatePortfolioWalletUseCase
 ) : ViewModel() {
@@ -27,18 +32,31 @@ class AddPortfolioWalletViewModel(
             initialValue = AddPortfolioWalletState(isLoading = false)
         )
 
+    /**
+     * Handles changes to the wallet address input field.
+     *
+     * @param newAddress The new wallet address input.
+     */
     fun onAddressChange(newAddress: TextFieldValue) {
         if (newAddress.text.length <= 255) {
             _state.update { it.copy(walletAddress = newAddress) }
         }
     }
 
+    /**
+     * Handles changes to the wallet name input field.
+     *
+     * @param newName The new name for the wallet.
+     */
     fun onNameChange(newName: String) {
         if (newName.length <= 18) {
             _state.update { it.copy(walletName = newName) }
         }
     }
 
+    /**
+     * Resets the wallet address selection when the focus is lost.
+     */
     fun onAddressFocusLost() {
         _state.update {
             // Reset the selection to the beginning
@@ -46,6 +64,11 @@ class AddPortfolioWalletViewModel(
         }
     }
 
+    /**
+     * Adds a wallet to the portfolio with the provided ID.
+     * This function constructs a command with the wallet address and name,
+     * then calls the use case to execute the addition.
+     */
     fun addPortfolioWallet(
         portfolioId: String,
     ) {

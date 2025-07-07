@@ -47,7 +47,15 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
-// --- AddWalletScreen Composable ---
+
+/**
+ * Composable function to display the Add Portfolio Wallet screen.
+ * Allows users to add a wallet to a specific portfolio.
+ *
+ * @param portfolioId The unique identifier of the portfolio to which the wallet will be added.
+ * @param onBackClicked Callback function to handle back navigation.
+ * @param onWalletAdded Callback function to handle actions after a wallet is successfully added.
+ */
 @Composable
 fun AddPortfolioWalletScreen(
     portfolioId: String,
@@ -122,6 +130,17 @@ private fun AddWalletTopBar(
     )
 }
 
+/**
+ * Composable function to display the content of the Add Portfolio Wallet screen.
+ * Contains input fields for wallet address and name, and displays any error messages.
+ *
+ * @param walletAddress The current value of the wallet address input field.
+ * @param walletName The name of the wallet being added, if provided.
+ * @param onAddressChange Callback to handle changes in the wallet address input field.
+ * @param onNameChange Callback to handle changes in the wallet name input field.
+ * @param error An optional error message to display if an error occurs while adding the wallet.
+ * @param onAddressFocusLost Callback to reset the address selection when focus is lost.
+ */
 @Composable
 private fun AddWalletContent(
     walletAddress: TextFieldValue,
@@ -174,6 +193,14 @@ private fun AddWalletContent(
     }
 }
 
+/**
+ * Composable function to display the continue button at the bottom of the Add Portfolio Wallet screen.
+ * The button is enabled only when the wallet address is not empty and not loading.
+ *
+ * @param isLoading Indicates whether the wallet addition process is currently loading.
+ * @param isEnabled Indicates whether the continue button should be enabled.
+ * @param onClick Callback function to handle the click event of the continue button.
+ */
 @Composable
 private fun BoxScope.AddWalletContinueButton(
     isLoading: Boolean,
@@ -210,6 +237,15 @@ private fun BoxScope.AddWalletContinueButton(
     }
 }
 
+/**
+ * Composable function to display the address input field for adding a wallet.
+ * It includes a placeholder, handles focus changes, and displays an error state if applicable.
+ *
+ * @param value The current value of the address input field.
+ * @param onValueChange Callback to handle changes in the address input field.
+ * @param isError Indicates whether the input field is in an error state.
+ * @param onFocusLost Callback to reset the address selection when focus is lost.
+ */
 @Composable
 private fun AddressInputField(
     value: TextFieldValue,

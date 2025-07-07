@@ -1,3 +1,5 @@
+package com.nextnonce.app.portfolio.presentation
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +33,6 @@ import com.nextnonce.app.balance.presentation.BalanceScreen
 import com.nextnonce.app.core.enums.NumberSign
 import com.nextnonce.app.core.presentation.LoadingOverlay
 import com.nextnonce.app.core.utils.fontSizeByLength
-import com.nextnonce.app.portfolio.presentation.PortfolioState
-import com.nextnonce.app.portfolio.presentation.PortfolioViewModel
 import com.nextnonce.app.theme.LocalNextNonceColorsPalette
 import nextnonce.composeapp.generated.resources.Res
 import nextnonce.composeapp.generated.resources.back
@@ -41,6 +41,13 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 
+/**
+ * Composable function to display the Portfolio screen.
+ * It shows the portfolio's total balance, asset balances, and allows navigation back.
+ *
+ * @param id The unique identifier of the portfolio.
+ * @param onBackClicked Callback function to handle back navigation.
+ */
 @Composable
 fun PortfolioScreen(
     id: String,
@@ -91,6 +98,14 @@ fun PortfolioScreen(
     }
 }
 
+/**
+ * Composable function to display the top bar for the Portfolio screen.
+ * It includes the portfolio name, access type, and a back button.
+ *
+ * @param name The name of the portfolio (nullable).
+ * @param access The access type of the portfolio (nullable).
+ * @param onBackClicked Callback function to handle back navigation.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PortfolioTopBar(
@@ -144,6 +159,10 @@ private fun PortfolioTopBar(
     )
 }
 
+/**
+ * Composable function to display the total portfolio balance item.*
+ * @param state The current state of the portfolio, containing the total balance and its change.
+ */
 @Composable
 fun TotalPortfolioBalanceItem(
     state: PortfolioState

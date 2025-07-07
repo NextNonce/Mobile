@@ -7,6 +7,11 @@ import com.nextnonce.app.portfolio.data.remote.dto.PortfolioBalancesDto
 import com.nextnonce.app.portfolio.data.remote.dto.PortfolioDto
 import com.nextnonce.app.portfolio.data.remote.dto.PortfolioWalletDto
 
+/**
+ * Remote data source interface for portfolio operations.
+ * This interface defines methods to interact with remote portfolio data,
+ * including fetching portfolios, portfolio details, balances, and wallets.
+ */
 interface RemotePortfolioDataSource  {
     suspend fun getPortfolios(): Result<List<PortfolioDto>, DataError.Remote>
     suspend fun getPortfolioById(id: String): Result<PortfolioDto, DataError.Remote>
