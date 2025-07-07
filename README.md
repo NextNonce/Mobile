@@ -1,4 +1,4 @@
-# NextNonce
+# NextNonce Mobile
 
 Welcome to the official repository for the **NextNonce Mobile App**. NextNonce is an on-chain crypto portfolio tracker for both Android and iOS.
 
