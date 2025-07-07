@@ -45,6 +45,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * Composable function that displays the authentication screen.
+ * It allows users to sign in or sign up using email and password or with Google (Android only).
+ * It also handles the loading state and displays error messages if any.
+ * @param onDone Callback function to be invoked when the sign-in or sign-up process is completed.
+ * @param composeAuth Instance of [ComposeAuth] for handling authentication flows.
+ */
 @Composable
 fun AuthScreen(
     onDone: () -> Unit,

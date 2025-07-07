@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for handling authentication operations such as sign up and sign in.
+ */
 class AuthViewModel(
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
     private val signInWithEmailUseCase: SignInWithEmailUseCase,
