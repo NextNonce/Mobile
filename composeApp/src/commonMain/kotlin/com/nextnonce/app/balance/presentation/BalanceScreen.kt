@@ -46,6 +46,14 @@ import nextnonce.composeapp.generated.resources.there_are_no_tokens
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
+/**
+ * Composable function that displays the balance screen with a list of asset balances.
+ * It includes a total balance section and a list of individual asset balances, which can be tokens or unified tokens.
+ * @param totalBalance A composable function to display the total balance.
+ * @param assetBalances A list of UI representations of asset balances to be displayed.
+ * @param onToggleItem Callback function to handle toggling of expandable items (unified tokens).
+ * @param onTokenClick Callback function to handle clicks on individual tokens.
+ */
 @Composable
 fun BalanceScreen(
     totalBalance: @Composable () -> Unit,
@@ -85,6 +93,16 @@ fun BalanceScreen(
     }
 }
 
+/**
+ * Extension function for LazyListScope to display a list of asset balances.
+ * It handles both single tokens and expandable unified tokens.
+ * This function uses the `items` DSL to create a list of items based on the provided asset balances.
+ * It differentiates between `UITokenBalanceListItem` and `UIUnifiedTokenBalanceListItem` to render them more efficiently.
+ *
+ * @param assetBalances A list of UI representations of asset balances to be displayed.
+ * @param onTokenClick Callback function to handle clicks on individual tokens.
+ * @param onToggleItem Callback function to handle toggling of expandable items (unified tokens).
+ */
 fun LazyListScope.assetBalanceList(
     assetBalances: List<UIAssetBalanceListItem>,
     onTokenClick: (String) -> Unit,
@@ -119,6 +137,12 @@ fun LazyListScope.assetBalanceList(
     }
 }
 
+/**
+ * Composable function that displays an expandable unified token item.
+ * It includes a clickable row for the unified token and an animated visibility section for its sub-tokens.
+ * @param unifiedToken The UI representation of the unified token balance to be displayed.
+ * @param onToggle Callback function to handle toggling the expansion of this item.
+ */
 @Composable
 private fun ExpandableUnifiedTokenItem(
     unifiedToken: UIUnifiedTokenBalanceListItem,
@@ -145,6 +169,13 @@ private fun ExpandableUnifiedTokenItem(
     }
 }
 
+/**
+ * Composable function that displays a single asset balance list item.
+ * It includes the token icon, name, native balance, quote balance, and change percentage.
+ * @param assetBalance The UI representation of the asset balance to be displayed.
+ * @param onClick Callback function to handle clicks on this item.
+ * @param isInnerItem Indicates if this is a sub-token item (used for indentation).
+ */
 @Composable
 private fun AssetBalanceListItem(
     assetBalance: UIAssetBalanceListItem,
@@ -220,6 +251,14 @@ private fun AssetBalanceListItem(
     }
 }
 
+/**
+ * Composable function that displays a token icon with its associated chain logo.
+ * The token icon is displayed in a circular shape, and the chain logo is displayed in the bottom right corner.
+ * It uses KamelImage for loading images asynchronously.
+ * @param assetLogoUrl The URL of the token's logo.
+ * @param chainLogoUrl The URL of the chain's logo.
+ * @param modifier Optional modifier for additional styling.
+ */
 @Composable
 private fun TokenIconWithChain(
     assetLogoUrl: String?,
