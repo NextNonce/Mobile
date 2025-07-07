@@ -103,6 +103,12 @@ kotlin {
     }
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.nextnonce.app"
     compileSdkVersion(libs.versions.android.compileSdk.get().toInt())
@@ -119,9 +125,26 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            val storeFile = localProperties.getProperty("MYAPP_RELEASE_STORE_FILE")
+            val storePassword = localProperties.getProperty("MYAPP_RELEASE_STORE_PASSWORD")
+            val keyAlias = localProperties.getProperty("MYAPP_RELEASE_KEY_ALIAS")
+            val keyPassword = localProperties.getProperty("MYAPP_RELEASE_KEY_PASSWORD")
+
+            if (storeFile != null) {
+                this.storeFile = rootProject.file(storeFile) // Correct property assignment
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
     buildTypes {
         getByName("release") {
+            isDebuggable = false
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -132,12 +155,6 @@ android {
 
 room {
     schemaDirectory("$projectDir/schemas")
-}
-
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(localPropertiesFile.inputStream())
 }
 
 buildkonfig {
