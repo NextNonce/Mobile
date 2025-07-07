@@ -1,6 +1,6 @@
 package com.nextnonce.app
 
-import PortfolioScreen
+import com.nextnonce.app.portfolio.presentation.PortfolioScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +38,11 @@ fun App() {
                 .background(MaterialTheme.colorScheme.background)
 
         ) {
+            /**
+             * Start Screen
+             * Checks if the user is signed in and navigates to the appropriate screen.
+             * If signed in, navigates to HomeScreen; otherwise, navigates to AuthScreen.
+             */
             composable<Start> {
                 StartScreen(
                     onUserSignedIn = {
@@ -55,6 +60,11 @@ fun App() {
                 )
             }
 
+            /**
+             * Auth Screen
+             * Allows the user to sign in or sign up.
+             * Reached from StartScreen if the user is not signed in.
+             */
             composable<Auth> {
                 AuthScreen(
                     onDone = {
@@ -66,6 +76,14 @@ fun App() {
                 )
             }
 
+            /**
+             * Home Screen
+             * Displays the user's default portfolio and its wallets.
+             * Allows navigation to Portfolio and Wallet screens.
+             * Provides option to navigate to AddWallet screen.
+             * Reached from StartScreen if the user is signed in.
+             * Reached from AuthScreen after successful sign-in or sign-up.
+             */
             composable<Home> {
                 HomeScreen(
                     onPortfolioClicked = { portfolioId ->
@@ -89,6 +107,11 @@ fun App() {
                 )
             }
 
+            /**
+             * Add Wallet Screen
+             * Allows the user to add a new wallet to a specific portfolio.
+             * Reached from HomeScreen when the "Add Wallet" button is clicked.
+             */
             composable<AddWallet> { navBackStackEntry ->
                 val portfolioId = navBackStackEntry.toRoute<AddWallet>().portfolioId
                 AddPortfolioWalletScreen(
@@ -102,6 +125,11 @@ fun App() {
                 )
             }
 
+            /**
+             * Portfolio Screen
+             * Displays the details of a specific portfolio.
+             * Reached from HomeScreen when a portfolio is clicked.
+             */
             composable<Portfolio> { navBackStackEntry ->
                 val portfolioId = navBackStackEntry.toRoute<Portfolio>().portfolioId
                 PortfolioScreen(
@@ -112,6 +140,11 @@ fun App() {
                 )
             }
 
+            /**
+             * Wallet Screen
+             * Displays the details of a specific wallet.
+             * Reached from HomeScreen when a wallet is clicked.
+             */
             composable<Wallet> { navBackStackEntry ->
                 val walletId = navBackStackEntry.toRoute<Wallet>().walletId
                 val walletName = navBackStackEntry.toRoute<Wallet>().walletName
