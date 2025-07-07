@@ -4,16 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-
-// basic red #e44c2d
-// background red #342421
-// basic green #2fa56b
-// background green #243421
-
-// light basic green #4AA34F
-// ...
-
-// for now they are the same as dark
 val ProfitGreenColor = Color(color = 0xFF2FA56B)
 val ProfitGreenBackgroundColor = Color(color = 0xFF243421)
 val LossRedColor = Color(color = 0xFFE44C2D)

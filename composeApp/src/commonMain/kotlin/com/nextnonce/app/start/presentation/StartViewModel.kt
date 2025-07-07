@@ -8,6 +8,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * ViewModel for managing the start screen state, checking if the user is signed in.
+ *
+ * @property isUserSignedInUseCase Use case for checking if the user is signed in.
+ */
 class StartViewModel (
     private val isUserSignedInUseCase: IsUserSignedInUseCase
 ) : ViewModel() {
