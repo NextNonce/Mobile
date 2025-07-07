@@ -55,7 +55,15 @@ import nextnonce.composeapp.generated.resources.view_wallet_details
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-
+/**
+ * Composable function that displays the home screen of the application.
+ * It shows a summary of the user's portfolio and a list of their wallets.
+ * It also provides callbacks for handling wallet and portfolio interactions.
+ *
+ * @param onPortfolioClicked Callback function to be invoked when the portfolio is clicked.
+ * @param onAddWalletClicked Callback function to be invoked when the add wallet button is clicked.
+ * @param onWalletClicked Callback function to be invoked when a wallet item is clicked.
+ */
 @Composable
 fun HomeScreen(
     onPortfolioClicked: (String) -> Unit = {},
@@ -92,7 +100,13 @@ fun HomeScreen(
     }
 }
 
-// --- Reusable UI Components ---
+/**
+ * Composable function that displays a summary card of the user's portfolio.
+ * It shows the portfolio balance, change percentage, and provides a clickable area to view details.
+ *
+ * @param state The current state of the home screen containing portfolio data.
+ * @param onClick Callback function to be invoked when the portfolio card is clicked.
+ */
 @Composable
 fun PortfolioSummaryCard(state: HomeState, onClick: (String) -> Unit) {
     val cardShape = RoundedCornerShape(20.dp)
@@ -177,6 +191,13 @@ fun PortfolioSummaryCard(state: HomeState, onClick: (String) -> Unit) {
     }
 }
 
+/**
+ * Composable function that displays the header for the My Wallets section.
+ * It includes a title and an add wallet button that triggers a callback when clicked.
+ *
+ * @param state The current state of the home screen containing portfolio data.
+ * @param onAddWalletClicked Callback function to be invoked when the add wallet button is clicked.
+ */
 @Composable
 fun MyWalletsHeader(
     state: HomeState,
@@ -209,6 +230,13 @@ fun MyWalletsHeader(
     }
 }
 
+/**
+ * Composable function that displays a list of wallet items.
+ * Each wallet item is clickable and triggers a callback when clicked.
+ *
+ * @param state The current state of the home screen containing wallet data.
+ * @param onWalletClicked Callback function to be invoked when a wallet item is clicked.
+ */
 @Composable
 fun WalletItems(
     state: HomeState,
@@ -235,6 +263,13 @@ fun WalletItems(
     }
 }
 
+/**
+ * Composable function that displays a single wallet item.
+ * It shows the wallet name, balance, change percentage.
+ *
+ * @param walletItem The UI model representing the wallet item to display.
+ * @param onClick Callback function to be invoked when the wallet item is clicked.
+ */
 @Composable
 fun WalletItem(walletItem: UIHomeWalletItem, onClick: () -> Unit) {
     val cardShape = RoundedCornerShape(16.dp)

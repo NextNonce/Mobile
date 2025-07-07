@@ -30,6 +30,15 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the Home screen, responsible for managing the state of the home portfolio and wallets.
+ * It fetches the default portfolio, its total balance, and the wallets associated with it.
+ *
+ * @property getDefaultPortfolioUseCase Use case to fetch the default portfolio.
+ * @property getPortfolioTotalBalanceUseCase Use case to fetch the total balance of a portfolio.
+ * @property getPortfolioWalletsUseCase Use case to fetch wallets associated with a portfolio.
+ * @property getWalletTotalBalanceUseCase Use case to fetch the total balance of a wallet.
+ */
 class HomeViewModel(
     private val getDefaultPortfolioUseCase: GetDefaultPortfolioUseCase,
     private val getPortfolioTotalBalanceUseCase: GetPortfolioTotalBalanceUseCase,
@@ -46,6 +55,10 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Observes the default portfolio and updates the state with the portfolio information.
+     * It also kicks off the observation of the portfolio's total balance and wallets.
+     */
     private suspend fun observeDefaultPortfolio() {
         getDefaultPortfolioUseCase.execute()
             // show loading until we have at least an error or value
@@ -79,6 +92,10 @@ class HomeViewModel(
             }
     }
 
+    /**
+     * Observes the total balance of the portfolio and updates the state with the formatted balance and change percent.
+     * @param portfolioId The ID of the portfolio to observe.
+     */
     private fun observePortfolioTotalBalance(portfolioId: String) = viewModelScope.launch {
         getPortfolioTotalBalanceUseCase.execute(portfolioId)
             .collect { result ->
@@ -105,11 +122,12 @@ class HomeViewModel(
     }
 
     /**
+     * Observes the wallets associated with the portfolio and updates the state with the list of wallets.
      * HYBRID LOGIC:
      * 1. Fetches the list of wallets.
      * 2. IMMEDIATELY displays that list with "loading" placeholders for balances.
      * 3. Launches a SINGLE background job that uses `combine` to efficiently fetch all balances.
-     * 4.Continuously collects updates from the combined flow to show cached, then fresh data.
+     * 4. Continuously collects updates from the combined flow to show cached, then fresh data.
      * This provides immediate feedback while ensuring efficient state updates.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -166,6 +184,9 @@ class HomeViewModel(
     /**
      * Helper function to map a wallet model and its balance result to a UI item.
      * Handles a nullable balanceResult to create loading states.
+     * @param pwm The PortfolioWalletModel to map.
+     * @param balanceResult The Result<TotalBalance, DataError> containing the balance data or null if loading.
+     * @return A UIHomeWalletItem representing the wallet with its balance and change percent.
      */
     private fun createUiHomeWalletItem(
         pwm: PortfolioWalletModel,
