@@ -7,6 +7,7 @@ import com.nextnonce.app.wallet.domain.model.WalletModel
 class GetWalletUseCase(
     private val walletRepository: WalletRepository
 ) {
+
     suspend fun execute(
         walletId: String
     ): Result<WalletModel, DataError> {

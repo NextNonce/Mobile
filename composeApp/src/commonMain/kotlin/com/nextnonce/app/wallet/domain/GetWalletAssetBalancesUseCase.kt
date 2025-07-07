@@ -12,6 +12,12 @@ class GetWalletAssetBalancesUseCase(
     private val walletRepository: WalletRepository
 ) {
 
+    /**
+     * Retrieves the asset balances for a specific wallet using balancesFlow from the wallet repository.
+     *
+     * @param walletId The ID of the wallet for which to retrieve asset balances.
+     * @return A flow that emits a Result containing a list of AssetBalance or a DataError.
+     */
     suspend fun execute(
         walletId: String
     ): Flow<Result<List<AssetBalance>, DataError>> {

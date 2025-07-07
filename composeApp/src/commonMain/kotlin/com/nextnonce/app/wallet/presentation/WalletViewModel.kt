@@ -24,6 +24,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing the state of a wallet, fetching wallet details,
+ * total balance, and asset balances.
+ *
+ * @property id The unique identifier of the wallet.
+ * @property name The name of the wallet (nullable).
+ * @property getWalletUseCase Use case for fetching wallet details.
+ * @property getWalletAssetBalancesUseCase Use case for fetching asset balances in the wallet.
+ * @property getWalletTotalBalanceUseCase Use case for fetching the total balance of the wallet.
+ */
 class WalletViewModel(
     private val id: String,
     private val name: String? = null,
@@ -47,6 +57,11 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Fetches the wallet details using the provided ID and updates the state with the results.
+     * If successful, it updates the UIWalletInfo with the wallet's address, name, and type.
+     * If an error occurs, it updates the state with the error message.
+     */
     private suspend fun getWallet() {
         val wallet = getWalletUseCase.execute(id)
         wallet.onSuccess { walletData ->
@@ -75,6 +90,9 @@ class WalletViewModel(
         }
     }
 
+    /**
+     * Fetches the total balance for the wallet and updates the state with the results.
+     */
     private suspend fun getWalletTotalBalance() {
         getWalletTotalBalanceUseCase.execute(id)
             .collect { result ->
@@ -106,6 +124,9 @@ class WalletViewModel(
             }
     }
 
+    /**
+     * Fetches the asset balances for the wallet and updates the state with the results.
+     */
     private suspend fun getAssetBalances() {
         getWalletAssetBalancesUseCase.execute(id)
             .onStart {
@@ -139,6 +160,11 @@ class WalletViewModel(
             }
     }
 
+    /**
+     * Expands or collapses a unified token balance item by toggling its expanded state.
+     * This function updates the state of the wallet to reflect the change in the unified token's expanded state.
+     * @param tokenId The unique identifier of the unified token to be expanded or collapsed.
+     */
     fun expandUnifiedToken(tokenId: String) {
         _state.update { it.copy(
             assetBalances = it.assetBalances.toggleUnified(tokenId)

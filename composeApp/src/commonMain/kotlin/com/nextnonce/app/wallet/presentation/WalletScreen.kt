@@ -41,6 +41,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/**
+ * WalletScreen composable function that displays wallet information, total balance, and asset balances.
+ *
+ * @param id The unique identifier of the wallet.
+ * @param name The name of the wallet (nullable).
+ * @param onBackClicked Callback function to handle back navigation.
+ */
 @Composable
 fun WalletScreen(
     id: String,
@@ -93,6 +100,14 @@ fun WalletScreen(
     }
 }
 
+/**
+ * WalletTopBar composable function that displays the top app bar with wallet information.
+ *
+ * @param address The wallet address.
+ * @param name The wallet name.
+ * @param walletType The type of the wallet.
+ * @param onBackClicked Callback function to handle back navigation.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WalletTopBar(
@@ -156,6 +171,11 @@ private fun WalletTopBar(
     )
 }
 
+/**
+ * TotalWalletBalanceItem composable function that displays the total balance and its change.
+ *
+ * @param state The current state of the wallet, containing total balance information.
+ */
 @Composable
 fun TotalWalletBalanceItem(
     state: WalletState,

@@ -11,6 +11,12 @@ import kotlinx.coroutines.flow.map
 class GetWalletTotalBalanceUseCase(
     private val walletRepository: WalletRepository
 ) {
+    /**
+     * Retrieves the total balance for a specific wallet using balancesFlow from the wallet repository.
+     *
+     * @param walletId The ID of the wallet for which to retrieve the total balance.
+     * @return A flow that emits a Result containing the TotalBalance or a DataError.
+     */
     suspend fun execute(
         walletId: String
     ): Flow<Result<TotalBalance, DataError>> {
