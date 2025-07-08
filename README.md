@@ -143,7 +143,7 @@ The process for running the application depends on your operating system.
 
 The project follows a feature-driven, multi-layered modular structure that separates concerns and promotes scalability.
 
-```
+```shell
 composeApp/src/commonMain/kotlin/com/nextnonce/app
 ├── auth/             # User authentication (Sign In/Up)
 │   ├── data/
